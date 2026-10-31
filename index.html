@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>unocode · Uno, a coding agent for the terminal</title>
+<meta name="description" content="Uno is a small, fast coding agent for the terminal. It asks before it changes anything, runs commands in a sandbox, and keeps a hard cap on spending.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%230b0b0b'/%3E%3Ccircle cx='8' cy='8' r='3.5' fill='%23ec5f5f'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Doto:wght@700;900&family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="top">
+  <a class="mark" href="#top" aria-label="unocode home"><span class="dots">UNO</span><span class="name">UNOCODE</span></a>
+  <nav class="toplinks">
+    <a href="#install">Install</a>
+    <a href="#commands">Commands</a>
+    <a href="#permissions">Permissions</a>
+    <a href="https://github.com/motiontic/unocode-releases/releases">Releases</a>
+  </nav>
+</header>
+
+<main id="top">
+
+<section class="hero">
+  <p class="eyebrow"><span class="live"></span> CODING AGENT FOR THE TERMINAL</p>
+  <h1 class="dots">Hey Uno.</h1>
+  <p class="lede">Uno reads your project, edits files and runs commands. It asks before it changes anything, runs shell commands in a sandbox, can undo every file change, and stops at a hard spending cap. It starts in milliseconds and is about 3 MB.</p>
+
+  <div class="install" role="tablist" aria-label="Ways to install">
+    <div class="tabs">
+      <button role="tab" aria-selected="true" data-tab="curl">curl</button>
+      <button role="tab" aria-selected="false" data-tab="brew">Homebrew</button>
+      <button role="tab" aria-selected="false" data-tab="npm">npm</button>
+    </div>
+    <div class="cmd" data-panel="curl"><code>curl -fsSL https://unocode.motiontic.com/install.sh | sh</code><button class="copy" aria-label="Copy">COPY</button></div>
+    <div class="cmd" data-panel="brew" hidden><code>brew install motiontic/tap/uno</code><button class="copy" aria-label="Copy">COPY</button></div>
+    <div class="cmd" data-panel="npm" hidden><code>npm i -g @motiontic/uno</code><button class="copy" aria-label="Copy">COPY</button></div>
+    <p class="fine">macOS and Linux, arm64 and x86_64. Then run <code>uno</code> in a project folder.</p>
+  </div>
+
+  <div class="cards">
+    <div class="card"><span class="num">01</span><h3>ASKS FIRST</h3><p>Edits and shell commands wait for your say-so, unless a rule or mode allows them.</p></div>
+    <div class="card"><span class="num">02</span><h3>SANDBOXED</h3><p>Shell commands cannot write outside the project, read your secrets or reach the network.</p></div>
+    <div class="card"><span class="num">03</span><h3>UNDOABLE</h3><p>Every file change is recorded, so <code>uno undo</code> puts it back.</p></div>
+    <div class="card"><span class="num">04</span><h3>CAPPED</h3><p>Spending on model calls stops at a cap you set, $5.00 unless you change it.</p></div>
+  </div>
+</section>
+
+<div class="layout">
+<aside class="toc" aria-label="Contents">
+  <p class="toc-title">CONTENTS</p>
+  <a href="#install">Install</a>
+  <a href="#first-run">First run</a>
+  <a href="#commands">Commands</a>
+  <a href="#chat">In the chat</a>
+  <a href="#screen">The screen</a>
+  <a href="#permissions">Permissions</a>
+  <a href="#sandbox">The sandbox</a>
+  <a href="#spending">Spending</a>
+  <a href="#sessions">Sessions and undo</a>
+  <a href="#settings">Settings</a>
+  <a href="#context">Instructions, memory, skills</a>
+  <a href="#web">Web and images</a>
+  <a href="#mcp">MCP servers</a>
+  <a href="#hooks">Hooks</a>
+  <a href="#update">Update and uninstall</a>
+  <a href="#verify">Check a download</a>
+</aside>
+
+<article class="doc">
+
+<section id="install">
+<h2><span class="n">01</span> Install</h2>
+<p>Pick one. All three install the same program.</p>
+<pre><code><span class="c"># the installer: puts uno in ~/.local/bin</span>
+curl -fsSL https://unocode.motiontic.com/install.sh | sh
+
+<span class="c"># Homebrew</span>
+brew install motiontic/tap/uno
+
+<span class="c"># npm (Node 18 or later)</span>
+npm i -g @motiontic/uno</code></pre>
+<ul>
+  <li>The installer checks the download against the release's checksums, and against its signature when <a href="https://jedisct1.github.io/minisign/">minisign</a> is installed. Set <code>UNO_VERSION=0.2.0</code> to install a particular version, or <code>UNO_INSTALL_DIR</code> to install somewhere other than <code>~/.local/bin</code>. If that folder is not on your <code>PATH</code>, it tells you the line to add.</li>
+  <li>Works on macOS and Linux, on Apple Silicon, Intel, arm64 and x86_64 machines. The Linux build runs on any distribution. Windows is not supported yet.</li>
+  <li>On Linux the sandbox needs <code>bubblewrap</code> from your package manager (<code>sudo apt install bubblewrap</code>, <code>sudo dnf install bubblewrap</code>). Without it, shell commands ask before they run.</li>
+</ul>
+</section>
+
+<section id="first-run">
+<h2><span class="n">02</span> First run</h2>
+<p>Uno talks to the model provider with your own API key. Put the key in <code>~/.config/uno/.env</code> so it works in any folder:</p>
+<pre><code>mkdir -p ~/.config/uno
+echo 'ANTHROPIC_API_KEY=sk-ant-...' &gt;&gt; ~/.config/uno/.env
+chmod 600 ~/.config/uno/.env</code></pre>
+<p>Keys are read from the environment first, then from a <code>.env</code> file in the folder you run <code>uno</code> in, then from <code>~/.config/uno/.env</code>. The names are <code>ANTHROPIC_API_KEY</code>, <code>OPENAI_API_KEY</code>, <code>GOOGLE_API_KEY</code>, and <code>OPENAI_COMPAT_API_KEY</code> for other servers.</p>
+<pre><code>cd your-project
+uno                                           <span class="c"># open a chat</span>
+uno -p "add a test for parse_date"             <span class="c"># run one task and print the answer</span>
+uno --model gpt-6-luna                        <span class="c"># another model</span>
+uno --provider openai-compat --base-url http://localhost:11434/v1 --model qwen3</code></pre>
+<p>The default model is <code>claude-sonnet-5</code>. The provider is worked out from the model's name: Anthropic, OpenAI, Gemini, or any OpenAI-compatible server with <code>--provider openai-compat</code> and <code>--base-url</code>.</p>
+</section>
+
+<section id="commands">
+<h2><span class="n">03</span> Commands</h2>
+<table>
+<thead><tr><th>Command</th><th>What it does</th></tr></thead>
+<tbody>
+<tr><td><code>uno</code></td><td>Open a chat. Type <code>/help</code> inside it for commands and keys</td></tr>
+<tr><td><code>uno -p "&lt;prompt&gt;"</code></td><td>Run one task and print the answer. A prompt piped in works too</td></tr>
+<tr><td><code>uno --resume [id] -p "…"</code></td><td>Continue a session; the newest one if no id is given</td></tr>
+<tr><td><code>uno --fork &lt;id&gt; -p "…"</code></td><td>Copy a session and continue the copy</td></tr>
+<tr><td><code>uno sessions</code></td><td>List this folder's sessions</td></tr>
+<tr><td><code>uno undo [--all] [--force]</code></td><td>Put back files the model changed</td></tr>
+<tr><td><code>uno trust [--status|--remove]</code></td><td>Let this folder's own settings, hooks and MCP servers take effect</td></tr>
+<tr><td><code>uno settings</code></td><td>Show the settings in effect and where each came from</td></tr>
+<tr><td><code>uno mcp login|logout &lt;name&gt;</code></td><td>Sign in to an HTTP MCP server in the browser, or forget the sign-in</td></tr>
+<tr><td><code>uno mcp status</code></td><td>Show each MCP server and how it signs in</td></tr>
+<tr><td><code>uno spend</code></td><td>Show spending against the cap</td></tr>
+<tr><td><code>uno update</code></td><td>Install the newest release, when uno came from the installer</td></tr>
+<tr><td><code>uno --version</code>, <code>--help</code></td><td>The version, or every option</td></tr>
+</tbody>
+</table>
+<p>Useful options: <code>--model</code>, <code>--mode</code> (see <a href="#permissions">Permissions</a>), <code>--allow "bash(cargo test)"</code>, <code>--max-cost 0.50</code> for one run, <code>--max-turns</code>, <code>--no-search</code>, <code>--no-memory</code>, <code>--image &lt;path&gt;</code>, <code>--output json</code> and <code>--screen dot|chat</code>. <code>uno --help</code> lists them all.</p>
+</section>
+
+<section id="chat">
+<h2><span class="n">04</span> In the chat</h2>
+<div class="two">
+<table>
+<thead><tr><th>Command</th><th>What it does</th></tr></thead>
+<tbody>
+<tr><td><code>/help</code></td><td>Commands and keys</td></tr>
+<tr><td><code>/mode [name]</code></td><td>Show or set the mode</td></tr>
+<tr><td><code>/model [name]</code></td><td>Show or set the model for the next turn</td></tr>
+<tr><td><code>/undo [all]</code></td><td>Put back the last file change, or all of them</td></tr>
+<tr><td><code>/sessions</code>, <code>/resume</code>, <code>/fork</code></td><td>Earlier conversations</td></tr>
+<tr><td><code>/compact</code></td><td>Shorten the conversation now, keeping a summary</td></tr>
+<tr><td><code>/cost</code></td><td>Spending in this chat and in total</td></tr>
+<tr><td><code>/status</code>, <code>/context</code>, <code>/budget</code></td><td>The agent's state, the context window, the spending</td></tr>
+<tr><td><code>/trust</code>, <code>/mcp</code>, <code>/skills</code>, <code>/memory</code></td><td>Trust, MCP servers, skills, long-term memory</td></tr>
+<tr><td><code>/reload</code></td><td>Read settings, skills, MCP servers and instructions again</td></tr>
+<tr><td><code>/quit</code></td><td>Leave</td></tr>
+</tbody>
+</table>
+<table>
+<thead><tr><th>Key</th><th>What it does</th></tr></thead>
+<tbody>
+<tr><td><kbd>Enter</kbd></td><td>Send</td></tr>
+<tr><td><kbd>\</kbd> then <kbd>Enter</kbd></td><td>A new line</td></tr>
+<tr><td><kbd>Esc</kbd> or <kbd>Ctrl-C</kbd></td><td>Stop the turn</td></tr>
+<tr><td><kbd>Ctrl-D</kbd></td><td>Leave</td></tr>
+<tr><td><kbd>↑</kbd> <kbd>↓</kbd></td><td>Earlier prompts</td></tr>
+<tr><td><kbd>PgUp</kbd> <kbd>PgDn</kbd></td><td>Scroll back</td></tr>
+<tr><td><kbd>Ctrl-V</kbd></td><td>Paste a picture from the clipboard</td></tr>
+<tr><td><code>@path</code>, or drag a file in</td><td>Attach an image</td></tr>
+</tbody>
+</table>
+</div>
+<p>To start a prompt with a slash, write two: <code>//etc/hosts</code>.</p>
+</section>
+
+<section id="screen">
+<h2><span class="n">05</span> The screen</h2>
+<p>The chat fills the window: the conversation on the left, and on the right three cards showing what Uno is doing, how full the context window is, and what has been spent. A permission question opens at the bottom of the conversation. Choose with <kbd>←</kbd> <kbd>→</kbd> and <kbd>Enter</kbd>, or press <kbd>y</kbd>, <kbd>a</kbd> or <kbd>n</kbd>. When you leave, the conversation is printed into the terminal, so its scrollback keeps it.</p>
+<p>If you prefer the terminal's own scrollback, selection and search while you work, use the scrolling chat. It has the same look, and <code>/status</code>, <code>/context</code> and <code>/budget</code> print the cards into it. Choose it with <code>--screen chat</code>, <code>UNO_SCREEN=chat</code>, or in settings:</p>
+<pre><code>{ "ui": { "screen": "chat", "accent": "yellow" } }</code></pre>
+<p><code>accent</code> is <code>red</code> (the default) or <code>yellow</code>. Windows smaller than 100 × 32 get the scrolling chat. <code>NO_COLOR</code> turns colour off.</p>
+</section>
+
+<section id="permissions">
+<h2><span class="n">06</span> Permissions</h2>
+<p>When a tool call needs your say-so, the chat asks. <kbd>y</kbd> allows it once, <kbd>a</kbd> for the rest of the session, <kbd>n</kbd> refuses. <kbd>a</kbd> on a file change covers every file change in the project for the session; on a shell command, it covers commands that start the same way.</p>
+<table>
+<thead><tr><th>Mode</th><th>Edits</th><th>Shell commands</th><th>Meant for</th></tr></thead>
+<tbody>
+<tr><td><code>default</code></td><td>ask</td><td>ask</td><td>everyday work; the chat starts here</td></tr>
+<tr><td><code>accept-edits</code></td><td>go ahead inside the project</td><td>ask</td><td>when you will review and undo if needed; <code>-p</code> starts here</td></tr>
+<tr><td><code>plan</code></td><td>refused, except the plan file</td><td>refused</td><td>reading and thinking only</td></tr>
+<tr><td><code>bypass</code></td><td>go ahead</td><td>go ahead</td><td>folders you trust completely; <code>deny</code> rules still hold</td></tr>
+</tbody>
+</table>
+<p>Set the mode with <code>--mode</code> or <code>/mode</code>. <code>--dangerously-skip-permissions</code> is the same as <code>--mode bypass</code>. With <code>-p</code> there is no one to ask, so anything that needs a say-so is refused, and the run exits with code 2.</p>
+<p>Rules are <code>tool</code> or <code>tool(pattern)</code>, in <code>allow</code>, <code>ask</code> and <code>deny</code> lists. <code>deny</code> beats <code>ask</code>, which beats <code>allow</code>:</p>
+<pre><code>{
+  "permissions": {
+    "allow": ["bash(cargo test)", "bash(npm run lint)", "web_fetch(docs.rs)"],
+    "deny":  ["bash(git push)"]
+  }
+}</code></pre>
+<p>The tools are <code>read</code>, <code>write</code>, <code>edit</code> (<code>apply_patch</code> on OpenAI models), <code>grep</code>, <code>glob</code>, <code>bash</code>, <code>web_fetch</code>, and MCP tools as <code>mcp__&lt;server&gt;__&lt;tool&gt;</code>. Files under <code>.git/</code>, <code>.uno/</code> and <code>.claude/</code> are never changed, and <code>.env</code> and key files are never read.</p>
+</section>
+
+<section id="sandbox">
+<h2><span class="n">07</span> The sandbox</h2>
+<p>Shell commands run in the operating system's sandbox: Seatbelt on macOS, bubblewrap on Linux. Inside it, a command can write to the project and temporary folders only. It cannot read <code>.env</code> files or credential folders such as <code>~/.ssh</code> and <code>~/.aws</code>, and it has no network.</p>
+<ul>
+  <li>A command that needs more, such as installing packages, can ask to run outside the sandbox. That always asks you first.</li>
+  <li>An allowed command (<code>--allow "bash(cargo test)"</code>, or a rule) runs unconfined on your machine, so keep rules narrow.</li>
+  <li><code>--no-sandbox</code> turns the sandbox off for a run; every command then asks.</li>
+</ul>
+</section>
+
+<section id="spending">
+<h2><span class="n">08</span> Spending</h2>
+<p>Every model call is priced and recorded before it can push spending past the cap. The cap is $5.00 in total unless you set another with <code>UNO_SPEND_CAP_USD</code>, for example <code>export UNO_SPEND_CAP_USD=50</code>. <code>uno spend</code> and <code>/cost</code> show where you are, and <code>--max-cost 0.50</code> limits a single run.</p>
+<p>A model missing from the price table is charged at a deliberately high rate, so the total can overstate what you really spent. Your provider's own dashboard has the real figures.</p>
+</section>
+
+<section id="sessions">
+<h2><span class="n">09</span> Sessions and undo</h2>
+<p>Every conversation is saved per folder. <code>uno sessions</code> lists them, <code>uno --resume</code> continues the newest, and <code>uno --fork &lt;id&gt;</code> continues a copy. Long conversations are shortened before they outgrow the model's window, keeping a summary.</p>
+<p>Every file change the model makes is recorded. <code>uno undo</code> (or <code>/undo</code>) puts back the newest change, and <code>--all</code> puts back the whole session's. If something else changed the file since, undo stops and says so; <code>--force</code> puts it back anyway.</p>
+</section>
+
+<section id="settings">
+<h2><span class="n">10</span> Settings</h2>
+<p>Settings are JSON, read from:</p>
+<ul>
+  <li><code>~/.config/uno/settings.json</code>: yours, for every project;</li>
+  <li><code>.uno/settings.json</code> and <code>.claude/settings.json</code> in the project, which count only after <code>uno trust</code>, and stop counting when they change until you trust the folder again.</li>
+</ul>
+<pre><code>{
+  "model": "claude-sonnet-5",
+  "mode": "default",
+  "permissions": { "allow": [], "ask": [], "deny": [] },
+  "sandbox": { "enabled": true },
+  "web": { "search": true },
+  "memory": { "enabled": true },
+  "skills": { "claude_home": false },
+  "ui": { "screen": "dot", "accent": "red" },
+  "hooks": {},
+  "mcpServers": {}
+}</code></pre>
+<p><code>uno settings</code> prints what is in effect and which file each value came from. Data such as sessions, memory and the spend record live in <code>~/.local/share/uno</code>.</p>
+</section>
+
+<section id="context">
+<h2><span class="n">11</span> Instructions, memory, skills</h2>
+<ul>
+  <li><strong>Instructions.</strong> <code>AGENTS.md</code> in the project (or <code>CLAUDE.md</code> where there is none) is read at the start of every session.</li>
+  <li><strong>Long-term memory.</strong> Markdown notes Uno keeps between sessions, one set for all projects and one for each project, read at the start and updated as it learns. <code>/memory</code> shows them; <code>--no-memory</code> or <code>"memory": {"enabled": false}</code> turns memory off.</li>
+  <li><strong>Skills.</strong> Folders with a <code>SKILL.md</code> (a <code>name</code> and <code>description</code> up top, then instructions) in <code>.agents/skills</code> or <code>.claude/skills</code>, in the project or your home folder. The model sees each skill's name and description, and reads the whole file when a task matches. <code>/skills</code> lists them. <code>~/.claude/skills</code> is used only with <code>"skills": {"claude_home": true}</code>.</li>
+</ul>
+</section>
+
+<section id="web">
+<h2><span class="n">12</span> Web and images</h2>
+<ul>
+  <li><strong>Search.</strong> On Anthropic, OpenAI and Gemini models, the model can use the provider's own web search, which the provider bills at about a cent a search. The pages an answer cites are listed after it. Turn it off with <code>--no-search</code> or <code>"web": {"search": false}</code>.</li>
+  <li><strong>Reading pages.</strong> <code>web_fetch</code> reads one public page as text. It refuses private and local addresses, and asks unless a rule covers the site: <code>web_fetch(docs.rs)</code>, <code>web_fetch(*.github.com)</code>.</li>
+  <li><strong>Images.</strong> Attach PNG, JPEG, GIF or WebP files: drag them in, type <code>@path</code>, press <kbd>Ctrl-V</kbd> for the clipboard, or pass <code>--image</code> with <code>-p</code>. Large images are shrunk, and location data is removed before sending. The model can also read images in the project.</li>
+</ul>
+</section>
+
+<section id="mcp">
+<h2><span class="n">13</span> MCP servers</h2>
+<p>Declare servers under <code>mcpServers</code>, in the same shape as Claude Code, in your settings, the project's <code>.mcp.json</code> or <code>.uno/settings.json</code>:</p>
+<pre><code>{
+  "mcpServers": {
+    "files":  { "command": "npx", "args": ["-y", "@modelcontextprotocol/server-filesystem", "."] },
+    "github": { "type": "http", "url": "https://api.githubcopilot.com/mcp/" }
+  }
+}</code></pre>
+<ul>
+  <li>However many servers you add, the model sees two small tools, one to find an MCP tool and one to call it. So adding servers costs almost nothing, and nothing starts until the model first uses one.</li>
+  <li>Each call asks. In the chat you can allow it once, the tool, the whole server, or every MCP tool for the session. As rules: <code>mcp__github__create_issue</code>, <code>mcp__github</code>, or <code>mcp</code>.</li>
+  <li>A project's servers load only after <code>uno trust</code>. Your API keys are never passed to a server.</li>
+  <li>Servers that sign in through the browser need <code>uno mcp login &lt;name&gt;</code> once (<code>--no-browser</code> prints the address instead). A browser never opens by itself during a run. Tokens are kept in <code>~/.config/uno/mcp-tokens.json</code>, readable by you only, and never shown to the model.</li>
+</ul>
+</section>
+
+<section id="hooks">
+<h2><span class="n">14</span> Hooks</h2>
+<p>Your own commands, run at five points, on Claude Code's contract: <code>PreToolUse</code>, <code>PostToolUse</code>, <code>UserPromptSubmit</code>, <code>Stop</code> and <code>SessionStart</code>.</p>
+<pre><code>{
+  "hooks": {
+    "PreToolUse": [
+      { "matcher": "Bash", "hooks": [{ "type": "command", "command": "~/bin/no-rm.sh", "timeout": 10 }] }
+    ]
+  }
+}</code></pre>
+<ul>
+  <li>The hook gets the event as JSON on standard input, and runs in the project folder without your API keys.</li>
+  <li>Exit code 2, or <code>"decision": "block"</code>, blocks: the tool call is not run, the prompt is not sent, or the model keeps going instead of stopping.</li>
+  <li>A hook can only make things stricter. A <code>PreToolUse</code> hook that times out or cannot start blocks the call.</li>
+  <li>Project hooks count only after <code>uno trust</code>.</li>
+</ul>
+</section>
+
+<section id="update">
+<h2><span class="n">15</span> Update and uninstall</h2>
+<table>
+<thead><tr><th>Installed with</th><th>Update</th><th>Uninstall</th></tr></thead>
+<tbody>
+<tr><td>the installer</td><td><code>uno update</code></td><td><code>rm ~/.local/bin/uno ~/.local/bin/.uno-installed</code></td></tr>
+<tr><td>Homebrew</td><td><code>brew upgrade uno</code></td><td><code>brew uninstall uno</code></td></tr>
+<tr><td>npm</td><td><code>npm i -g @motiontic/uno</code></td><td><code>npm rm -g @motiontic/uno</code></td></tr>
+</tbody>
+</table>
+<p><code>uno update</code> checks the new release's signature with the key built into uno, and makes sure it starts before replacing the old one. Your settings and data are in <code>~/.config/uno</code> and <code>~/.local/share/uno</code>; delete those too to remove everything.</p>
+</section>
+
+<section id="verify">
+<h2><span class="n">16</span> Check a download</h2>
+<p>Every release file on <a href="https://github.com/motiontic/unocode-releases/releases">GitHub</a> has a <a href="https://jedisct1.github.io/minisign/">minisign</a> signature beside it, and the public key is in <a href="https://github.com/motiontic/unocode-releases/blob/main/minisign.pub">minisign.pub</a>:</p>
+<pre><code>minisign -V -p minisign.pub -m uno-aarch64-apple-darwin</code></pre>
+<p>The signed comment names the version and the machine type, for example <code>uno 0.2.0 aarch64-apple-darwin</code>.</p>
+<p>uno is free to use; see the <a href="https://github.com/motiontic/unocode-releases/blob/main/LICENSE">licence</a>.</p>
+</section>
+
+</article>
+</div>
+</main>
+
+<footer class="foot">
+  <span class="dots small">UNO</span>
+  <span>unocode · a coding agent for the terminal</span>
+  <a href="https://github.com/motiontic/unocode-releases/releases">Releases</a>
+</footer>
+
+<script>
+for (const tab of document.querySelectorAll("[data-tab]")) {
+  tab.addEventListener("click", () => {
+    for (const t of document.querySelectorAll("[data-tab]")) t.setAttribute("aria-selected", t === tab);
+    for (const p of document.querySelectorAll("[data-panel]")) p.hidden = p.dataset.panel !== tab.dataset.tab;
+  });
+}
+for (const button of document.querySelectorAll(".copy")) {
+  button.addEventListener("click", async () => {
+    const text = button.parentElement.querySelector("code").textContent;
+    try {
+      await navigator.clipboard.writeText(text);
+      button.textContent = "COPIED";
+    } catch {
+      button.textContent = "SELECT";
+    }
+    setTimeout(() => (button.textContent = "COPY"), 1600);
+  });
+}
+</script>
+</body>
+</html>
