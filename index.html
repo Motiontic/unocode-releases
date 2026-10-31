@@ -16,6 +16,7 @@
 <header class="top">
   <a class="mark" href="#top" aria-label="unocode home"><span class="dots">UNO</span><span class="name">UNOCODE</span></a>
   <nav class="toplinks">
+    <a href="#why">Why Uno</a>
     <a href="#install">Install</a>
     <a href="#commands">Commands</a>
     <a href="#permissions">Permissions</a>
@@ -28,7 +29,7 @@
 <section class="hero">
   <p class="eyebrow"><span class="live"></span> CODING AGENT FOR THE TERMINAL</p>
   <h1 class="dots">Hey Uno.</h1>
-  <p class="lede">Uno reads your project, edits files and runs commands. It asks before it changes anything, runs shell commands in a sandbox, can undo every file change, and stops at a hard spending cap. It starts in milliseconds and is about 3 MB.</p>
+  <p class="lede">Uno reads your project, edits files and runs commands. It asks before it changes anything, runs shell commands in a sandbox, can undo every file change, and stops at a hard spending cap. It starts in milliseconds and is about 3 MB. It is young and does not do everything yet, so <a href="#why">here is where it stands</a>.</p>
 
   <div class="install" role="tablist" aria-label="Ways to install">
     <div class="tabs">
@@ -53,6 +54,7 @@
 <div class="layout">
 <aside class="toc" aria-label="Contents">
   <p class="toc-title">CONTENTS</p>
+  <a href="#why">Why Uno</a>
   <a href="#install">Install</a>
   <a href="#first-run">First run</a>
   <a href="#commands">Commands</a>
@@ -64,7 +66,8 @@
   <a href="#sessions">Sessions and undo</a>
   <a href="#settings">Settings</a>
   <a href="#context">Instructions, memory, skills</a>
-  <a href="#web">Web and images</a>
+  <a href="#helpers">Helper agents</a>
+  <a href="#web">Web, browser and images</a>
   <a href="#mcp">MCP servers</a>
   <a href="#hooks">Hooks</a>
   <a href="#update">Update and uninstall</a>
@@ -73,8 +76,37 @@
 
 <article class="doc">
 
+<section id="why">
+<h2><span class="n">01</span> Why Uno</h2>
+<p>Uno is a small coding agent, built from scratch by a small team. It does much of what Claude Code and Codex do, and several of its best ideas came from studying them. Where it differs is size and cost. Here is where it stands, including the parts that are not there yet.</p>
+<table>
+<thead><tr><th>Measure</th><th>Uno</th><th>Claude Code</th></tr></thead>
+<tbody>
+<tr><td>Download</td><td>about 3 MB</td><td>217 MB</td></tr>
+<tr><td>Memory while it waits for you</td><td>about 3 MB</td><td>about 180 MB</td></tr>
+<tr><td>Instructions sent with every request</td><td>about 3,500 tokens</td><td>about 46,000 tokens</td></tr>
+</tbody>
+</table>
+<p>That last row matters most for your bill: every request carries those standing instructions, and you pay for them each time. On ten practice coding exercises, with the same model (Claude Haiku 4.5) and one try each:</p>
+<table>
+<thead><tr><th>Ten exercises</th><th>Uno</th><th>Claude Code</th></tr></thead>
+<tbody>
+<tr><td>Solved</td><td>10 of 10</td><td>10 of 10</td></tr>
+<tr><td>Cost</td><td>$0.35</td><td>$1.11</td></tr>
+<tr><td>Time</td><td>about 4 minutes</td><td>about 12 minutes</td></tr>
+</tbody>
+</table>
+<p>What this does not show:</p>
+<ul>
+  <li><strong>Ten small exercises is a small test.</strong> It cannot tell the two apart on harder, longer work. We ran it ourselves on 30 September 2026, before the browser, long-term memory and helper agents arrived. We will run it again and publish the result, even if the gap shrinks.</li>
+  <li><strong>Uno is not smarter.</strong> The model does the thinking. Give Uno and another agent the same model and expect the same quality of work.</li>
+  <li><strong>We have not measured Codex yet.</strong> Every figure here is against Claude Code.</li>
+  <li><strong>Still to come:</strong> Windows, a to-do list Uno keeps while it works, asking you a question when it is unsure, scheduled runs, and streamed JSON output for scripts.</li>
+</ul>
+</section>
+
 <section id="install">
-<h2><span class="n">01</span> Install</h2>
+<h2><span class="n">02</span> Install</h2>
 <p>Pick one. All three install the same program.</p>
 <pre><code><span class="c"># the installer: puts uno in ~/.local/bin</span>
 curl -fsSL https://unocode.motiontic.com/install.sh | sh
@@ -92,7 +124,7 @@ npm i -g @motiontic/uno</code></pre>
 </section>
 
 <section id="first-run">
-<h2><span class="n">02</span> First run</h2>
+<h2><span class="n">03</span> First run</h2>
 <p>Uno talks to the model provider with your own API key. Put the key in <code>~/.config/uno/.env</code> so it works in any folder:</p>
 <pre><code>mkdir -p ~/.config/uno
 echo 'ANTHROPIC_API_KEY=sk-ant-...' &gt;&gt; ~/.config/uno/.env
@@ -107,7 +139,7 @@ uno --provider openai-compat --base-url http://localhost:11434/v1 --model qwen3<
 </section>
 
 <section id="commands">
-<h2><span class="n">03</span> Commands</h2>
+<h2><span class="n">04</span> Commands</h2>
 <table>
 <thead><tr><th>Command</th><th>What it does</th></tr></thead>
 <tbody>
@@ -130,7 +162,7 @@ uno --provider openai-compat --base-url http://localhost:11434/v1 --model qwen3<
 </section>
 
 <section id="chat">
-<h2><span class="n">04</span> In the chat</h2>
+<h2><span class="n">05</span> In the chat</h2>
 <div class="two">
 <table>
 <thead><tr><th>Command</th><th>What it does</th></tr></thead>
@@ -166,7 +198,7 @@ uno --provider openai-compat --base-url http://localhost:11434/v1 --model qwen3<
 </section>
 
 <section id="screen">
-<h2><span class="n">05</span> The screen</h2>
+<h2><span class="n">06</span> The screen</h2>
 <p>The chat fills the window. A new chat opens on a welcome: Uno in large dots, then cards about the folder, the guards and the budget. From the first prompt a strip of cards runs across the top, showing what Uno is doing, how full the context window is and what has been spent, and the conversation takes the full width below it. In a short window the strip folds to one line. A permission question opens at the bottom of the conversation. Choose with <kbd>←</kbd> <kbd>→</kbd> and <kbd>Enter</kbd>, or press <kbd>y</kbd>, <kbd>a</kbd> or <kbd>n</kbd>. When you leave, the conversation is printed into the terminal, so its scrollback keeps it.</p>
 <p>If you prefer the terminal's own scrollback, selection and search while you work, use the scrolling chat. It has the same look, and <code>/status</code>, <code>/context</code> and <code>/budget</code> print the cards into it. Choose it with <code>--screen chat</code>, <code>UNO_SCREEN=chat</code>, or in settings:</p>
 <pre><code>{ "ui": { "screen": "chat", "accent": "yellow" } }</code></pre>
@@ -174,7 +206,7 @@ uno --provider openai-compat --base-url http://localhost:11434/v1 --model qwen3<
 </section>
 
 <section id="permissions">
-<h2><span class="n">06</span> Permissions</h2>
+<h2><span class="n">07</span> Permissions</h2>
 <p>When a tool call needs your say-so, the chat asks. <kbd>y</kbd> allows it once, <kbd>a</kbd> for the rest of the session, <kbd>n</kbd> refuses. <kbd>a</kbd> on a file change covers every file change in the project for the session; on a shell command, it covers commands that start the same way.</p>
 <table>
 <thead><tr><th>Mode</th><th>Edits</th><th>Shell commands</th><th>Meant for</th></tr></thead>
@@ -197,7 +229,7 @@ uno --provider openai-compat --base-url http://localhost:11434/v1 --model qwen3<
 </section>
 
 <section id="sandbox">
-<h2><span class="n">07</span> The sandbox</h2>
+<h2><span class="n">08</span> The sandbox</h2>
 <p>Shell commands run in the operating system's sandbox: Seatbelt on macOS, bubblewrap on Linux. Inside it, a command can write to the project and temporary folders only. It cannot read <code>.env</code> files or credential folders such as <code>~/.ssh</code> and <code>~/.aws</code>, and it has no network.</p>
 <ul>
   <li>A command that needs more, such as installing packages, can ask to run outside the sandbox. That always asks you first.</li>
@@ -207,19 +239,19 @@ uno --provider openai-compat --base-url http://localhost:11434/v1 --model qwen3<
 </section>
 
 <section id="spending">
-<h2><span class="n">08</span> Spending</h2>
+<h2><span class="n">09</span> Spending</h2>
 <p>Every model call is priced and recorded before it can push spending past the cap. The cap is $5.00 in total unless you set another with <code>UNO_SPEND_CAP_USD</code>, for example <code>export UNO_SPEND_CAP_USD=50</code>. <code>uno spend</code> and <code>/cost</code> show where you are, and <code>--max-cost 0.50</code> limits a single run.</p>
 <p>A model missing from the price table is charged at a deliberately high rate, so the total can overstate what you really spent. Your provider's own dashboard has the real figures.</p>
 </section>
 
 <section id="sessions">
-<h2><span class="n">09</span> Sessions and undo</h2>
+<h2><span class="n">10</span> Sessions and undo</h2>
 <p>Every conversation is saved per folder. <code>uno sessions</code> lists them, <code>uno --resume</code> continues the newest, and <code>uno --fork &lt;id&gt;</code> continues a copy. Long conversations are shortened before they outgrow the model's window, keeping a summary.</p>
 <p>Every file change the model makes is recorded. <code>uno undo</code> (or <code>/undo</code>) puts back the newest change, and <code>--all</code> puts back the whole session's. If something else changed the file since, undo stops and says so; <code>--force</code> puts it back anyway.</p>
 </section>
 
 <section id="settings">
-<h2><span class="n">10</span> Settings</h2>
+<h2><span class="n">11</span> Settings</h2>
 <p>Settings are JSON, read from:</p>
 <ul>
   <li><code>~/.config/uno/settings.json</code>: yours, for every project;</li>
@@ -241,25 +273,37 @@ uno --provider openai-compat --base-url http://localhost:11434/v1 --model qwen3<
 </section>
 
 <section id="context">
-<h2><span class="n">11</span> Instructions, memory, skills</h2>
+<h2><span class="n">12</span> Instructions, memory, skills</h2>
 <ul>
   <li><strong>Instructions.</strong> <code>AGENTS.md</code> in the project (or <code>CLAUDE.md</code> where there is none) is read at the start of every session.</li>
   <li><strong>Long-term memory.</strong> Markdown notes Uno keeps between sessions, one set for all projects and one for each project, read at the start and updated as it learns. <code>/memory</code> shows them; <code>--no-memory</code> or <code>"memory": {"enabled": false}</code> turns memory off.</li>
+  <li><strong>Past sessions.</strong> Uno can search earlier conversations for what was said and done, and read around a match. It looks in this project unless you ask for another or for all of them, and it searches your prompts, its replies and the commands and edits it made, not file contents or command output.</li>
   <li><strong>Skills.</strong> Folders with a <code>SKILL.md</code> (a <code>name</code> and <code>description</code> up top, then instructions) in <code>.agents/skills</code> or <code>.claude/skills</code>, in the project or your home folder. The model sees each skill's name and description, and reads the whole file when a task matches. <code>/skills</code> lists them. <code>~/.claude/skills</code> is used only with <code>"skills": {"claude_home": true}</code>.</li>
 </ul>
 </section>
 
+<section id="helpers">
+<h2><span class="n">13</span> Helper agents</h2>
+<p>Uno can hand a side job to a helper: a fresh copy of itself that does the work and sends back a short report. Long searches and test logs stay out of the main conversation, so it stays short and cheap.</p>
+<ul>
+  <li><strong>Explore helpers</strong> read and search, on the provider's cheaper model, and several can run side by side.</li>
+  <li><strong>General helpers</strong> can also edit and run commands, one at a time, on your session's model, under the same permissions, sandbox and hooks as Uno itself.</li>
+  <li>Up to four run at once. Each stops after 50 model turns, 10 minutes, or a quarter of the spending cap left when it started.</li>
+</ul>
+</section>
+
 <section id="web">
-<h2><span class="n">12</span> Web and images</h2>
+<h2><span class="n">14</span> Web, browser and images</h2>
 <ul>
   <li><strong>Search.</strong> On Anthropic, OpenAI and Gemini models, the model can use the provider's own web search, which the provider bills at about a cent a search. The pages an answer cites are listed after it. Turn it off with <code>--no-search</code> or <code>"web": {"search": false}</code>.</li>
   <li><strong>Reading pages.</strong> <code>web_fetch</code> reads one public page as text. It refuses private and local addresses, and asks unless a rule covers the site: <code>web_fetch(docs.rs)</code>, <code>web_fetch(*.github.com)</code>.</li>
+  <li><strong>A real browser.</strong> For pages that need JavaScript, a sign-in, or clicking and typing, Uno drives a browser through agent-browser, which you install yourself: <code>brew install agent-browser</code> or <code>npm i -g agent-browser</code>. The first browsing command of a session asks, and then plain browsing is covered for that session. It starts with a fresh browser profile with no logins, and uses your own only when you ask for it in a prompt, asking every time.</li>
   <li><strong>Images.</strong> Attach PNG, JPEG, GIF or WebP files: drag them in, type <code>@path</code>, press <kbd>Ctrl-V</kbd> for the clipboard, or pass <code>--image</code> with <code>-p</code>. Large images are shrunk, and location data is removed before sending. The model can also read images in the project.</li>
 </ul>
 </section>
 
 <section id="mcp">
-<h2><span class="n">13</span> MCP servers</h2>
+<h2><span class="n">15</span> MCP servers</h2>
 <p>Declare servers under <code>mcpServers</code>, in the same shape as Claude Code, in your settings, the project's <code>.mcp.json</code> or <code>.uno/settings.json</code>:</p>
 <pre><code>{
   "mcpServers": {
@@ -276,7 +320,7 @@ uno --provider openai-compat --base-url http://localhost:11434/v1 --model qwen3<
 </section>
 
 <section id="hooks">
-<h2><span class="n">14</span> Hooks</h2>
+<h2><span class="n">16</span> Hooks</h2>
 <p>Your own commands, run at five points, on Claude Code's contract: <code>PreToolUse</code>, <code>PostToolUse</code>, <code>UserPromptSubmit</code>, <code>Stop</code> and <code>SessionStart</code>.</p>
 <pre><code>{
   "hooks": {
@@ -294,7 +338,7 @@ uno --provider openai-compat --base-url http://localhost:11434/v1 --model qwen3<
 </section>
 
 <section id="update">
-<h2><span class="n">15</span> Update and uninstall</h2>
+<h2><span class="n">17</span> Update and uninstall</h2>
 <table>
 <thead><tr><th>Installed with</th><th>Update</th><th>Uninstall</th></tr></thead>
 <tbody>
@@ -307,11 +351,12 @@ uno --provider openai-compat --base-url http://localhost:11434/v1 --model qwen3<
 </section>
 
 <section id="verify">
-<h2><span class="n">16</span> Check a download</h2>
+<h2><span class="n">18</span> Check a download</h2>
 <p>Every release file on <a href="https://github.com/motiontic/unocode-releases/releases">GitHub</a> has a <a href="https://jedisct1.github.io/minisign/">minisign</a> signature beside it, and the public key is in <a href="https://github.com/motiontic/unocode-releases/blob/main/minisign.pub">minisign.pub</a>:</p>
 <pre><code>minisign -V -p minisign.pub -m uno-aarch64-apple-darwin</code></pre>
 <p>The signed comment names the version and the machine type, for example <code>uno 0.2.0 aarch64-apple-darwin</code>.</p>
 <p>uno is free to use; see the <a href="https://github.com/motiontic/unocode-releases/blob/main/LICENSE">licence</a>.</p>
+<p>Found a bug, or something here unclear? It is early, so things will break. <a href="https://github.com/motiontic/unocode-releases/issues">Open an issue on GitHub</a>, even for small things.</p>
 </section>
 
 </article>
@@ -321,7 +366,7 @@ uno --provider openai-compat --base-url http://localhost:11434/v1 --model qwen3<
 <footer class="foot">
   <span class="dots small">UNO</span>
   <span>unocode · a coding agent for the terminal</span>
-  <a href="https://github.com/motiontic/unocode-releases/releases">Releases</a>
+  <span style="margin-left: auto; display: flex; gap: 16px;"><a href="https://github.com/motiontic/unocode-releases/issues">Issues</a><a href="https://github.com/motiontic/unocode-releases/releases">Releases</a></span>
 </footer>
 
 <script>

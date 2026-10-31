@@ -246,7 +246,7 @@ td:first-child { white-space: nowrap; }
 
 @media (max-width: 900px) {
   .cards { grid-template-columns: 1fr 1fr; }
-  .layout { grid-template-columns: 1fr; gap: 0; }
+  .layout { grid-template-columns: minmax(0, 1fr); gap: 0; }
   .toc { display: none; }
   .two { grid-template-columns: 1fr; gap: 0; }
 }
