@@ -167,10 +167,10 @@ uno --provider openai-compat --base-url http://localhost:11434/v1 --model qwen3<
 
 <section id="screen">
 <h2><span class="n">05</span> The screen</h2>
-<p>The chat fills the window: the conversation on the left, and on the right three cards showing what Uno is doing, how full the context window is, and what has been spent. A permission question opens at the bottom of the conversation. Choose with <kbd>←</kbd> <kbd>→</kbd> and <kbd>Enter</kbd>, or press <kbd>y</kbd>, <kbd>a</kbd> or <kbd>n</kbd>. When you leave, the conversation is printed into the terminal, so its scrollback keeps it.</p>
+<p>The chat fills the window. A new chat opens on a welcome: Uno in large dots, then cards about the folder, the guards and the budget. From the first prompt a strip of cards runs across the top, showing what Uno is doing, how full the context window is and what has been spent, and the conversation takes the full width below it. In a short window the strip folds to one line. A permission question opens at the bottom of the conversation. Choose with <kbd>←</kbd> <kbd>→</kbd> and <kbd>Enter</kbd>, or press <kbd>y</kbd>, <kbd>a</kbd> or <kbd>n</kbd>. When you leave, the conversation is printed into the terminal, so its scrollback keeps it.</p>
 <p>If you prefer the terminal's own scrollback, selection and search while you work, use the scrolling chat. It has the same look, and <code>/status</code>, <code>/context</code> and <code>/budget</code> print the cards into it. Choose it with <code>--screen chat</code>, <code>UNO_SCREEN=chat</code>, or in settings:</p>
 <pre><code>{ "ui": { "screen": "chat", "accent": "yellow" } }</code></pre>
-<p><code>accent</code> is <code>red</code> (the default) or <code>yellow</code>. Windows smaller than 100 × 32 get the scrolling chat. <code>NO_COLOR</code> turns colour off.</p>
+<p><code>accent</code> is <code>red</code> (the default) or <code>yellow</code>. Windows smaller than 80 × 14 get the scrolling chat. <code>NO_COLOR</code> turns colour off.</p>
 </section>
 
 <section id="permissions">
