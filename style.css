@@ -229,6 +229,23 @@ td { padding: 9px 12px 9px 0; vertical-align: top; border-bottom: 1px solid var(
 td:first-child { white-space: nowrap; }
 .two { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 .two table td:first-child { white-space: normal; }
+.layout.solo { grid-template-columns: minmax(0, 1fr); }
+
+/* Tiles into the docs (the landing page and the docs home) */
+.tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 16px 0 28px; }
+.tile {
+  display: block;
+  padding: 16px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--fg);
+}
+.tile:hover { border-color: var(--accent); color: var(--fg); }
+.tile small { font: 600 10px var(--mono); letter-spacing: 0.18em; color: var(--accent); }
+.tile b { display: block; margin: 4px 0; font: 700 17px var(--dots); letter-spacing: 0.05em; color: var(--str); }
+.tile span { font-size: 13px; color: var(--dim); }
 
 .foot {
   display: flex;
@@ -249,6 +266,7 @@ td:first-child { white-space: nowrap; }
   .layout { grid-template-columns: minmax(0, 1fr); gap: 0; }
   .toc { display: none; }
   .two { grid-template-columns: 1fr; gap: 0; }
+  .tiles { grid-template-columns: 1fr 1fr; }
 }
 
 @media (max-width: 560px) {
@@ -256,6 +274,7 @@ td:first-child { white-space: nowrap; }
   .hero { padding-top: 44px; }
   .lede { font-size: 16px; }
   .cards { grid-template-columns: 1fr; }
+  .tiles { grid-template-columns: 1fr; }
   .cmd code { font-size: 13px; }
   .doc table { display: block; overflow-x: auto; }
   td:first-child { white-space: normal; }

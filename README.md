@@ -1,6 +1,6 @@
 # unocode
 
-Uno is a coding agent for the terminal. It reads your project, edits files and runs commands, asking before it changes anything. Shell commands run in a sandbox that cannot write outside the project, read your secrets or reach the network. Spending has a hard cap, and every file change can be undone.
+Uno is a coding agent for the terminal. It reads your project, edits files and runs commands, asking before it edits a file. Shell commands run without asking, inside a sandbox that cannot write outside the project, read your secrets or reach the network. Spending has a hard cap, and every file change can be undone.
 
 Documentation: **https://unocode.motiontic.com**
 

@@ -1,0 +1,2053 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>uno docs</title>
+<meta name="description" content="Documentation for Uno, a small, fast coding agent for the terminal: concepts, design decisions, use cases and reference.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%230b0b0b'/%3E%3Ccircle cx='8' cy='8' r='3.5' fill='%23ec5f5f'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Doto:wght@700;900&family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="docs.css">
+</head>
+<body>
+
+<header class="top">
+  <a class="mark" href="index.html" aria-label="unocode home"><span class="dots">UNO</span><span class="name">UNOCODE</span></a>
+  <nav class="toplinks">
+    <a href="docs.html#/usecases">Use cases</a>
+    <a href="docs.html#/decisions">Design</a>
+    <a href="https://github.com/motiontic/unocode-releases/releases">Releases</a>
+    <a class="on" href="docs.html">Docs</a>
+  </nav>
+</header>
+
+<div class="dgrid">
+
+<aside class="dnav" aria-label="Documentation">
+  <div class="search"><input type="search" placeholder="Search the docs" aria-label="Search the docs"><kbd>/</kbd></div>
+  <div class="results"></div>
+  <button class="btn navtoggle">MENU</button>
+  <div class="ngroup"><p>START</p>
+    <a href="#/overview">Overview</a>
+    <a href="#/install">Install</a>
+    <a href="#/quickstart">Quickstart</a>
+    <a href="#/how">How Uno works</a>
+  </div>
+  <div class="ngroup"><p>CORE CONCEPTS</p>
+    <a href="#/tools">Tools</a>
+    <a href="#/context">Context and cost</a>
+    <a href="#/compaction">Compaction</a>
+    <a href="#/sessions">Sessions and undo</a>
+    <a href="#/screen">The Dot screen</a>
+    <a href="#/providers">Providers and models</a>
+  </div>
+  <div class="ngroup"><p>SAFETY</p>
+    <a href="#/safety">The safety model</a>
+    <a href="#/permissions">Permissions and modes</a>
+    <a href="#/sandbox">The sandbox</a>
+    <a href="#/trust">Trust</a>
+    <a href="#/spending">The spending cap</a>
+  </div>
+  <div class="ngroup"><p>WHAT UNO KNOWS</p>
+    <a href="#/instructions">Instruction files</a>
+    <a href="#/memory">Long-term memory</a>
+    <a href="#/recall">Recall</a>
+    <a href="#/skills">Skills</a>
+  </div>
+  <div class="ngroup"><p>EXTEND</p>
+    <a href="#/extend">Which one do I use?</a>
+    <a href="#/mcp">MCP servers</a>
+    <a href="#/hooks">Hooks</a>
+    <a href="#/helpers">Helper agents</a>
+    <a href="#/web">Web and browser</a>
+    <a href="#/images">Images</a>
+  </div>
+  <div class="ngroup"><p>AUTOMATE</p>
+    <a href="#/headless">Headless runs</a>
+    <a href="#/ci">CI and scripts</a>
+  </div>
+  <div class="ngroup"><p>GUIDES</p>
+    <a href="#/usecases">Use cases<span class="tag">14</span></a>
+    <a href="#/practices">Best practices</a>
+    <a href="#/trouble">Troubleshooting</a>
+  </div>
+  <div class="ngroup"><p>REFERENCE</p>
+    <a href="#/cli">CLI</a>
+    <a href="#/chatref">Slash commands and keys</a>
+    <a href="#/settings">Settings</a>
+    <a href="#/env">Environment</a>
+    <a href="#/toolref">Tool reference</a>
+    <a href="#/output">JSON output and exit codes</a>
+  </div>
+  <div class="ngroup"><p>DESIGN</p>
+    <a href="#/decisions">Design decisions</a>
+    <a href="#/notbuilt">What we didn't build</a>
+    <a href="#/glossary">Glossary</a>
+  </div>
+</aside>
+
+<main class="dmain">
+
+<!-- ============================== START ============================== -->
+
+<section class="page" data-page="overview">
+  <p class="crumb">START</p>
+  <h1>Uno docs</h1>
+  <p class="lede">Uno is a coding agent for the terminal. You tell it what you want in plain words; it reads your project, edits files and runs commands until the job is done. These docs explain every part of it in plain language, with a picture, an example and real use cases for each.</p>
+
+  <figure class="fig">
+    <svg viewBox="0 0 760 300" role="img" aria-label="You talk to Uno. Uno asks the model what to do next. The model asks for a tool. The guard checks it, the tool runs, and the result goes back to the model. This repeats until the model answers.">
+      <defs><pattern id="g1" width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" class="s-grid"/></pattern></defs>
+      <rect width="760" height="300" fill="url(#g1)"/>
+      <path id="o1" class="s-dash" d="M140,150 L262,150"/>
+      <path id="o2" class="s-dash" d="M384,112 C440,70 500,62 560,66"/>
+      <path id="o3" class="s-dash" d="M560,90 C510,100 440,128 392,140"/>
+      <path id="o4" class="s-dash" d="M384,188 C420,215 440,232 470,236"/>
+      <path id="o5" class="s-dash" d="M520,236 L560,236"/>
+      <path id="o6" class="s-dash" d="M560,256 C480,282 400,250 362,210"/>
+      <rect class="s-box" x="20" y="120" width="120" height="60" rx="10"/>
+      <text class="s-t" x="80" y="147" text-anchor="middle">YOU</text>
+      <text class="s-s" x="80" y="166" text-anchor="middle">a prompt</text>
+      <circle cx="324" cy="150" r="62" class="s-box hot"/>
+      <circle cx="324" cy="150" r="74" class="s-dash"/>
+      <text class="s-d" x="324" y="156" text-anchor="middle" style="font-size:26px">UNO</text>
+      <text class="s-s" x="324" y="176" text-anchor="middle">the loop</text>
+      <rect class="s-box" x="560" y="40" width="180" height="62" rx="10"/>
+      <text class="s-t" x="650" y="66" text-anchor="middle">MODEL</text>
+      <text class="s-s" x="650" y="86" text-anchor="middle">decides the next step</text>
+      <rect class="s-box" x="470" y="216" width="50" height="40" rx="8"/>
+      <text class="s-s" x="495" y="240" text-anchor="middle">GUARD</text>
+      <rect class="s-box" x="560" y="210" width="180" height="62" rx="10"/>
+      <text class="s-t" x="650" y="236" text-anchor="middle">TOOLS</text>
+      <text class="s-s" x="650" y="256" text-anchor="middle">read · edit · bash · web</text>
+      <g class="s-s">
+        <text x="200" y="140" text-anchor="middle">1 ask</text>
+        <text x="470" y="56">2 think</text>
+        <text x="420" y="242" text-anchor="end">3 check</text>
+        <text x="440" y="290">4 result</text>
+      </g>
+      <circle r="5" class="s-dot" opacity="0"><animateMotion dur="7s" begin="0s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.12;1" calcMode="linear"><mpath href="#o1"/></animateMotion><animate attributeName="opacity" dur="7s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.12;0.13;1"/></circle>
+      <circle r="5" class="s-dot" opacity="0"><animateMotion dur="7s" begin="0.85s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.12;1" calcMode="linear"><mpath href="#o2"/></animateMotion><animate attributeName="opacity" dur="7s" begin="0.85s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.12;0.13;1"/></circle>
+      <circle r="5" class="s-dot w" opacity="0"><animateMotion dur="7s" begin="1.7s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.12;1" calcMode="linear"><mpath href="#o3"/></animateMotion><animate attributeName="opacity" dur="7s" begin="1.7s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.12;0.13;1"/></circle>
+      <circle r="5" class="s-dot" opacity="0"><animateMotion dur="7s" begin="2.55s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.12;1" calcMode="linear"><mpath href="#o4"/></animateMotion><animate attributeName="opacity" dur="7s" begin="2.55s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.12;0.13;1"/></circle>
+      <circle r="5" class="s-dot ok" opacity="0"><animateMotion dur="7s" begin="3.4s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.06;1" calcMode="linear"><mpath href="#o5"/></animateMotion><animate attributeName="opacity" dur="7s" begin="3.4s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.06;0.07;1"/></circle>
+      <circle r="5" class="s-dot ok" opacity="0"><animateMotion dur="7s" begin="3.9s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.14;1" calcMode="linear"><mpath href="#o6"/></animateMotion><animate attributeName="opacity" dur="7s" begin="3.9s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.14;0.15;1"/></circle>
+    </svg>
+    <figcaption><span>The whole idea in one picture. You ask; the model picks a tool; the guard checks it; the tool runs; the result goes back. Round and round until the model has an answer.</span><button class="btn" data-replay>REPLAY</button></figcaption>
+  </figure>
+
+  <h2>Where to start</h2>
+  <div class="tiles">
+    <a class="tile" href="#/quickstart"><small>5 MINUTES</small><b>Quickstart</b><span>Install, add a key, finish your first real task.</span></a>
+    <a class="tile" href="#/how"><small>THE CORE IDEA</small><b>How Uno works</b><span>Step through one task, call by call.</span></a>
+    <a class="tile" href="#/usecases"><small>14 RECIPES</small><b>Use cases</b><span>Fix a test, learn a codebase, run in CI, and more.</span></a>
+    <a class="tile" href="#/safety"><small>READ THIS</small><b>The safety model</b><span>What Uno can and cannot do to your machine.</span></a>
+    <a class="tile" href="#/extend"><small>DECIDE</small><b>Which one do I use?</b><span>Instructions, memory, skills, hooks or MCP.</span></a>
+    <a class="tile" href="#/decisions"><small>WHY</small><b>Design decisions</b><span>The choices behind Uno, and what they cost.</span></a>
+  </div>
+
+  <h2>What Uno is good at</h2>
+  <ul>
+    <li><strong>Everyday coding.</strong> Fix a bug, add a test, rename across files, explain a module you have never seen.</li>
+    <li><strong>Staying cheap.</strong> Uno sends about 3,500 tokens of standing instructions with each request, where Claude Code sends about 46,000. On ten practice exercises with the same model, Uno spent $0.35 to Claude Code's $1.11 and solved the same ten.</li>
+    <li><strong>Staying out of trouble.</strong> It asks before changing things, runs shell commands in a sandbox, can undo every file change and stops at a spending cap.</li>
+    <li><strong>Scripts and CI.</strong> <code>uno -p "…"</code> runs one task with no questions and prints the answer, or JSON.</li>
+  </ul>
+
+  <h2>What Uno is not</h2>
+  <ul>
+    <li><strong>Not smarter than its model.</strong> The model does the thinking. Uno is the harness around it: the tools, the guards and the memory.</li>
+    <li><strong>Not finished.</strong> Windows, a to-do list, asking you questions mid-task, scheduled runs and streamed JSON are still to come. See <a href="#/notbuilt">What we didn't build</a>.</li>
+    <li><strong>Not an IDE plugin or a cloud service.</strong> It is one 3 MB program that runs in your terminal, with your own API key.</li>
+  </ul>
+
+  <div class="note"><b>HOW THESE DOCS ARE WRITTEN</b><p>Each concept page opens with a one-line summary, then a picture that moves, then an example you can run, then use cases, and ends with a <em>design decision</em> box that says why it works this way. Press <kbd>/</kbd> to search.</p></div>
+</section>
+
+<section class="page" data-page="install">
+  <p class="crumb">START</p>
+  <h1>Install</h1>
+  <p class="lede">Three ways in. All three install the same 3 MB program.</p>
+  <div class="tldr"><b>IN ONE LINE</b><span>Run the installer, put an API key in <code>~/.config/uno/.env</code>, then type <code>uno</code> in a project.</span></div>
+
+  <h2>Pick one</h2>
+<pre><code># the installer: puts uno in ~/.local/bin and can update itself
+curl -fsSL https://unocode.motiontic.com/install.sh | sh
+
+# Homebrew
+brew install motiontic/tap/uno
+
+# npm (Node 18 or later)
+npm i -g @motiontic/uno</code></pre>
+  <table>
+    <thead><tr><th>Choose</th><th>When</th><th>Updates with</th></tr></thead>
+    <tbody>
+      <tr><td>the installer</td><td>You want the smallest setup and <code>uno update</code></td><td><code>uno update</code></td></tr>
+      <tr><td>Homebrew</td><td>You manage tools with brew already</td><td><code>brew upgrade uno</code></td></tr>
+      <tr><td>npm</td><td>Your team pins tools in <code>package.json</code>, or you are in CI with Node</td><td><code>npm i -g @motiontic/uno</code></td></tr>
+    </tbody>
+  </table>
+
+  <h2>Machines</h2>
+  <ul>
+    <li>macOS and Linux, on arm64 and x86_64. The Linux build runs on any distribution.</li>
+    <li>Linux needs <code>bubblewrap</code> for the sandbox: <code>sudo apt install bubblewrap</code> or <code>sudo dnf install bubblewrap</code>. Without it, every command asks before it runs.</li>
+    <li>Windows is not supported yet.</li>
+  </ul>
+
+  <h2>Installer options</h2>
+  <ul>
+    <li><code>UNO_VERSION=0.1.1</code> installs a particular version.</li>
+    <li><code>UNO_INSTALL_DIR=/somewhere</code> installs outside <code>~/.local/bin</code>. If the folder is not on your <code>PATH</code>, the installer prints the line to add.</li>
+    <li>It checks the download against the release's checksums, and against its signature when <a href="https://jedisct1.github.io/minisign/">minisign</a> is installed.</li>
+  </ul>
+
+  <h2>Verify</h2>
+<pre><code>uno --version      # prints the version
+uno settings       # shows the settings in effect and where each came from</code></pre>
+
+  <h2>Update and uninstall</h2>
+  <table>
+    <thead><tr><th>Installed with</th><th>Update</th><th>Uninstall</th></tr></thead>
+    <tbody>
+      <tr><td>the installer</td><td><code>uno update</code></td><td><code>rm ~/.local/bin/uno ~/.local/bin/.uno-installed</code></td></tr>
+      <tr><td>Homebrew</td><td><code>brew upgrade uno</code></td><td><code>brew uninstall uno</code></td></tr>
+      <tr><td>npm</td><td><code>npm i -g @motiontic/uno</code></td><td><code>npm rm -g @motiontic/uno</code></td></tr>
+    </tbody>
+  </table>
+  <p>Settings live in <code>~/.config/uno</code>, and sessions, memory and the spend record in <code>~/.local/share/uno</code>. Delete both to remove everything.</p>
+
+  <div class="why"><b>DESIGN DECISION · D36</b><p>The source is private, but releases are public and signed. Every file is signed with minisign, and the signed comment names the version and machine (<code>uno 0.1.1 aarch64-apple-darwin</code>), so a signature cannot be moved to another file. <code>uno update</code> checks it against a key built into uno before it replaces anything.</p></div>
+</section>
+
+<section class="page" data-page="quickstart">
+  <p class="crumb">START</p>
+  <h1>Quickstart</h1>
+  <p class="lede">From nothing to a fixed bug in five minutes.</p>
+  <div class="tldr"><b>IN ONE LINE</b><span>Add a key, open <code>uno</code> in a project, describe the job, answer <kbd>y</kbd> / <kbd>a</kbd> / <kbd>n</kbd> when it asks.</span></div>
+
+  <h2>1. Give it a key</h2>
+  <p>Uno talks to the model with your own API key. Put it in your config folder so it works in every project:</p>
+<pre><code>mkdir -p ~/.config/uno
+echo 'ANTHROPIC_API_KEY=sk-ant-...' &gt;&gt; ~/.config/uno/.env
+chmod 600 ~/.config/uno/.env</code></pre>
+  <p>Other providers: <code>OPENAI_API_KEY</code>, <code>GOOGLE_API_KEY</code>, or <code>OPENAI_COMPAT_API_KEY</code> for any OpenAI-compatible server. See <a href="#/providers">Providers and models</a>.</p>
+
+  <h2>2. Open a chat in your project</h2>
+<pre><code>cd ~/code/my-app
+uno</code></pre>
+  <p>You see the <a href="#/screen">Dot screen</a>: Uno in large dots, then cards for this folder, the guards and the budget. Type what you want and press <kbd>Enter</kbd>.</p>
+
+  <h2>3. Ask for something real</h2>
+  <div class="ex"><div class="bar"><i></i><i></i><i></i>&nbsp;UNO · MY-APP</div><div class="term">
+    <div class="ln u">the signup form accepts emails with spaces in them. fix it and add a test</div>
+    <div class="ln t">grep "validate_email" src/</div>
+    <div class="ln o">src/forms/signup.ts:18  export function validateEmail(v: string) {</div>
+    <div class="ln t">read src/forms/signup.ts</div>
+    <div class="ln t">edit src/forms/signup.ts  (+2 −1)</div>
+    <div class="ln q">Allow this edit?  y once · a all edits this session · n no</div>
+    <div class="ln u">a</div>
+    <div class="ln t">write src/forms/signup.test.ts</div>
+    <div class="ln t">bash npm test -- signup        (sandboxed)</div>
+    <div class="ln o">✓ 6 tests passed</div>
+    <div class="ln a">Trimmed the value and rejected inner whitespace in validateEmail. Added signup.test.ts with three cases; all six tests pass.</div>
+  </div></div>
+
+  <h2>4. Look, keep or undo</h2>
+  <ul>
+    <li><code>git diff</code> shows what changed. Uno never commits for you unless you ask.</li>
+    <li><code>/undo</code> in the chat (or <code>uno undo</code> later) puts back the newest file change; <code>/undo all</code> puts back the whole session's.</li>
+    <li><code>/cost</code> shows what the task cost.</li>
+  </ul>
+
+  <h2>5. Try a one-shot run</h2>
+<pre><code>uno -p "explain what src/billing/ does, in five bullet points"</code></pre>
+  <p>No chat, no questions: it prints the answer and exits. Anything that would need your say-so is refused, so this is safe to try. See <a href="#/headless">Headless runs</a>.</p>
+
+  <h2>What to read next</h2>
+  <div class="tiles">
+    <a class="tile" href="#/how"><small>CONCEPT</small><b>How Uno works</b><span>The loop behind that transcript.</span></a>
+    <a class="tile" href="#/permissions"><small>SAFETY</small><b>Permissions</b><span>Stop answering the same question.</span></a>
+    <a class="tile" href="#/instructions"><small>SETUP</small><b>AGENTS.md</b><span>Tell Uno how your project works.</span></a>
+  </div>
+</section>
+
+<section class="page" data-page="how">
+  <p class="crumb">START</p>
+  <h1>How Uno works</h1>
+  <p class="lede">Uno is a loop. It sends the conversation to the model; the model either answers or asks for a tool; Uno checks the tool call, runs it, and sends the result back. That is all.</p>
+  <div class="tldr"><b>IN ONE LINE</b><span>Model decides, guard checks, tool runs, result goes back. Repeat until the model answers without asking for a tool.</span></div>
+
+  <h2>Step through a real task</h2>
+  <figure class="fig stepper" data-intro="Press PLAY, or NEXT to go one step at a time.">
+    <svg viewBox="0 0 760 220" role="img" aria-label="Five boxes: You, Uno, Model, Guard, Tools, lit one by one as the task runs.">
+      <path data-k="e-you" class="s-line edge" d="M130,110 L250,110"/>
+      <path data-k="e-model" class="s-line edge" d="M370,92 C430,40 470,40 520,48"/>
+      <path data-k="e-guard" class="s-line edge" d="M370,128 C410,170 430,175 456,176"/>
+      <path data-k="e-tools" class="s-line edge" d="M556,176 L600,176"/>
+      <path data-k="e-back" class="s-line edge" d="M650,150 C650,100 640,80 640,72"/>
+      <g class="node" data-k="you"><rect class="s-box" x="20" y="80" width="110" height="60" rx="10"/><text class="s-t" x="75" y="115" text-anchor="middle">YOU</text></g>
+      <g class="node" data-k="uno"><rect class="s-box" x="250" y="74" width="120" height="72" rx="36"/><text class="s-t" x="310" y="115" text-anchor="middle">UNO</text></g>
+      <g class="node" data-k="model"><rect class="s-box" x="520" y="20" width="220" height="52" rx="10"/><text class="s-t" x="630" y="51" text-anchor="middle">MODEL</text></g>
+      <g class="node" data-k="guard"><rect class="s-box" x="456" y="152" width="100" height="48" rx="10"/><text class="s-t" x="506" y="181" text-anchor="middle">GUARD</text></g>
+      <g class="node" data-k="tools"><rect class="s-box" x="600" y="150" width="140" height="52" rx="10"/><text class="s-t" x="670" y="181" text-anchor="middle">TOOLS</text></g>
+    </svg>
+    <div class="term">
+      <div class="ln u" data-hl="you e-you uno" data-say="<b>01</b>You type a task. Uno adds it to the conversation and sends the whole conversation to the model.">the date parser crashes on 2026-02-30. fix it</div>
+      <div class="ln t" data-hl="model e-model" data-say="<b>02</b>The model does not know the code yet, so it asks for a search. It can ask for several read-only tools at once; they run side by side.">grep "fn parse_date"</div>
+      <div class="ln o" data-hl="guard e-guard tools e-tools" data-say="<b>03</b>The guard checks the call. Searching is read-only and inside the project, so it runs without a question.">src/date.rs:42</div>
+      <div class="ln t" data-hl="model e-back" data-say="<b>04</b>The result goes back to the model, which now asks to read the file around that line.">read src/date.rs  lines 30–70</div>
+      <div class="ln t" data-hl="model e-model" data-say="<b>05</b>The model has seen the bug: it never checks the day against the month. It asks to edit.">edit src/date.rs  (+4 −1)</div>
+      <div class="ln q" data-hl="guard you" data-say="<b>06</b>Edits change your files, so in default mode the guard stops and asks you. Uno saves a snapshot first, so the edit can be undone.">Allow this edit?  y · a · n   → y</div>
+      <div class="ln t" data-hl="tools e-tools guard e-guard" data-say="<b>07</b>The model asks to run the tests. Inside the sandbox a command can write to the project and build caches but not the rest of your home folder, read no secrets and reach no network, so it runs without a question.">bash cargo test date</div>
+      <div class="ln o" data-hl="e-back model" data-say="<b>08</b>The output goes back to the model. Long output is cut to its end, and the full text is saved to a file the model can read if it needs to.">test result: ok. 14 passed</div>
+      <div class="ln a" data-hl="uno e-you you" data-say="<b>09</b>The model answers without asking for a tool. That ends the loop, and Uno shows you the answer and the cost.">Fixed: parse_date now rejects days past the month's end. Added a test for 2026-02-30. 14 tests pass.</div>
+    </div>
+    <p class="steptext"></p>
+    <figcaption><span>One task, nine steps, four tool calls.</span><button class="btn pri" data-play>▶ PLAY</button><button class="btn" data-next>NEXT</button><button class="btn" data-reset>RESET</button></figcaption>
+  </figure>
+
+  <h2>The parts</h2>
+  <table>
+    <thead><tr><th>Part</th><th>Its job</th><th>Read more</th></tr></thead>
+    <tbody>
+      <tr><td>The loop</td><td>Sends the conversation, streams the reply, runs the tools the model asks for, repeats</td><td>this page</td></tr>
+      <tr><td>The model</td><td>Decides every next step. Uno never scripts a plan for it</td><td><a href="#/providers">Providers</a></td></tr>
+      <tr><td>The tools</td><td>Read, write, edit, search, shell, web, helpers, memory search</td><td><a href="#/tools">Tools</a></td></tr>
+      <tr><td>The guard</td><td>Trust, rules, mode and sandbox, checked on every call</td><td><a href="#/safety">Safety model</a></td></tr>
+      <tr><td>The store</td><td>Saves every message as it happens, so a session can be resumed</td><td><a href="#/sessions">Sessions</a></td></tr>
+      <tr><td>The screen</td><td>Shows you all of this, and asks your permission</td><td><a href="#/screen">Dot screen</a></td></tr>
+    </tbody>
+  </table>
+
+  <h2>Rules the loop follows</h2>
+  <ul>
+    <li><strong>Read-only tools run together; changing tools run one at a time.</strong> Three searches finish in the time of one, and two edits never race.</li>
+    <li><strong>The tool list never changes during a session.</strong> That keeps the start of every request identical, so the provider can cache it. See <a href="#/context">Context and cost</a>.</li>
+    <li><strong>A reply cut off by the length limit never runs its tool calls.</strong> Half a command is worse than none.</li>
+    <li><strong>Network errors are retried</strong> with backoff, up to five attempts in all, but only before any of the reply has been shown.</li>
+    <li><strong>Turns are capped.</strong> <code>--max-turns</code> stops a run that goes round too long.</li>
+    <li><strong>You can type while it works.</strong> Your message is added at the next tool result, without stopping the turn. <kbd>Esc</kbd> stops it.</li>
+  </ul>
+
+  <div class="why"><b>DESIGN DECISION · L1, D2</b><p>No workflow graph, no "plan, act, critique" scaffolding, no agent framework. Current models plan on their own, and hard-coded steps get in their way. Uno's job is to give the model good tools and safe limits, then step aside. The whole loop is under a thousand lines of Rust that talk to each provider over plain HTTPS.</p></div>
+</section>
+
+<!-- ============================== CORE CONCEPTS ============================== -->
+
+<section class="page" data-page="tools">
+  <p class="crumb">CORE CONCEPTS</p>
+  <h1>Tools</h1>
+  <p class="lede">Tools are the model's hands. The model cannot touch your machine directly; it can only ask Uno to run one of a short, fixed list of tools.</p>
+  <div class="tldr"><b>IN ONE LINE</b><span>Six core tools (read, write, edit, grep, glob, bash) plus web, helpers, memory search and MCP. Every call goes through the guard.</span></div>
+
+  <figure class="fig">
+    <svg viewBox="0 0 760 230" role="img" aria-label="Tools in three groups. Read-only tools run side by side. Changing tools run one at a time. Reach tools go beyond the project.">
+      <text class="s-s" x="20" y="22">READ-ONLY · run side by side</text>
+      <text class="s-s" x="280" y="22">CHANGING · one at a time</text>
+      <text class="s-s" x="530" y="22">REACH</text>
+      <g>
+        <rect class="s-box ok" x="20" y="36" width="70" height="34" rx="8"/><text class="s-t" x="55" y="58" text-anchor="middle">read</text>
+        <rect class="s-box ok" x="100" y="36" width="70" height="34" rx="8"/><text class="s-t" x="135" y="58" text-anchor="middle">grep</text>
+        <rect class="s-box ok" x="180" y="36" width="70" height="34" rx="8"/><text class="s-t" x="215" y="58" text-anchor="middle">glob</text>
+        <rect class="s-box hot" x="280" y="36" width="70" height="34" rx="8"/><text class="s-t" x="315" y="58" text-anchor="middle">write</text>
+        <rect class="s-box hot" x="360" y="36" width="70" height="34" rx="8"/><text class="s-t" x="395" y="58" text-anchor="middle">edit</text>
+        <rect class="s-box hot" x="440" y="36" width="70" height="34" rx="8"/><text class="s-t" x="475" y="58" text-anchor="middle">bash</text>
+        <rect class="s-box" x="530" y="36" width="100" height="34" rx="8"/><text class="s-t" x="580" y="58" text-anchor="middle">web_fetch</text>
+        <rect class="s-box" x="640" y="36" width="100" height="34" rx="8"/><text class="s-t" x="690" y="58" text-anchor="middle">task</text>
+        <rect class="s-box" x="530" y="78" width="100" height="34" rx="8"/><text class="s-t" x="580" y="100" text-anchor="middle">recall</text>
+        <rect class="s-box" x="640" y="78" width="100" height="34" rx="8"/><text class="s-t" x="690" y="100" text-anchor="middle">mcp ×2</text>
+      </g>
+      <text class="s-s" x="20" y="146">time →</text>
+      <line class="s-line" x1="70" y1="142" x2="740" y2="142"/>
+      <g>
+        <rect x="70" y="156" height="12" rx="3" fill="var(--ok)"><animate attributeName="width" values="0;120;120" keyTimes="0;0.3;1" dur="5s" repeatCount="indefinite"/></rect>
+        <rect x="70" y="174" height="12" rx="3" fill="var(--ok)"><animate attributeName="width" values="0;150;150" keyTimes="0;0.36;1" dur="5s" repeatCount="indefinite"/></rect>
+        <rect x="70" y="192" height="12" rx="3" fill="var(--ok)"><animate attributeName="width" values="0;95;95" keyTimes="0;0.25;1" dur="5s" repeatCount="indefinite"/></rect>
+        <rect x="240" y="174" height="12" rx="3" fill="var(--accent)"><animate attributeName="width" values="0;0;130;130" keyTimes="0;0.38;0.62;1" dur="5s" repeatCount="indefinite"/></rect>
+        <rect x="380" y="174" height="12" rx="3" fill="var(--accent)"><animate attributeName="width" values="0;0;150;150" keyTimes="0;0.64;0.9;1" dur="5s" repeatCount="indefinite"/></rect>
+      </g>
+      <text class="s-s" x="230" y="222">three searches at once, then two edits in turn</text>
+    </svg>
+    <figcaption><span>Reads never conflict, so they run together. Changes can conflict, so they wait their turn.</span><button class="btn" data-replay>REPLAY</button></figcaption>
+  </figure>
+
+  <h2>The list</h2>
+  <table>
+    <thead><tr><th>Tool</th><th>What it does</th><th>Asks?</th></tr></thead>
+    <tbody>
+      <tr><td><code>read</code></td><td>Reads a file, up to 2,000 lines or 50 KB at a time. Reads images too</td><td>no, inside the project</td></tr>
+      <tr><td><code>grep</code></td><td>Searches file contents, skipping what <code>.gitignore</code> skips</td><td>no</td></tr>
+      <tr><td><code>glob</code></td><td>Finds files by name pattern, newest first</td><td>no</td></tr>
+      <tr><td><code>write</code></td><td>Creates or replaces a file. A snapshot is taken first</td><td>by mode</td></tr>
+      <tr><td><code>edit</code></td><td>Replaces exact pieces of a file, all or nothing. OpenAI models get <code>apply_patch</code> instead</td><td>by mode</td></tr>
+      <tr><td><code>bash</code></td><td>Runs a shell command, in the sandbox. Long output is cut to its end and saved to a file</td><td>only to leave the sandbox</td></tr>
+      <tr><td><code>web_fetch</code></td><td>Reads one public web page as text</td><td>yes, unless a rule covers the site</td></tr>
+      <tr><td><code>task</code></td><td>Hands a side job to a <a href="#/helpers">helper agent</a></td><td>no; the helper's own calls are checked</td></tr>
+      <tr><td><code>recall</code></td><td>Searches <a href="#/recall">past sessions</a></td><td>no</td></tr>
+      <tr><td><code>mcp_search</code>, <code>mcp_call</code></td><td>Find and call tools on your <a href="#/mcp">MCP servers</a></td><td><code>mcp_search</code> no; <code>mcp_call</code> yes, unless a rule allows it</td></tr>
+    </tbody>
+  </table>
+  <p>Web search is not in the list: it is the provider's own search, run on their side. The browser is not either: Uno drives it through <code>bash</code>, taught by a bundled skill. See <a href="#/web">Web and browser</a>.</p>
+
+  <h2>Use cases</h2>
+  <div class="uses">
+    <div class="use"><h4>Find before you fix</h4><p>Ask "where do we parse dates?" The model runs several greps at once and reads only the hits.</p><code class="run">uno -p "where do we parse dates?"</code></div>
+    <div class="use"><h4>Rename across a codebase</h4><p>One <code>edit</code> per file, each all or nothing, each undoable.</p><code class="run">uno -p "rename getUser to fetchUser everywhere"</code></div>
+  </div>
+
+  <div class="why"><b>DESIGN DECISION · L3</b><p>Keep the core tiny. Strong coding agents get by with a handful of tools, and every extra tool costs tokens on every request and gives the model one more thing to get wrong. A new tool has to justify itself. That is why the browser is a skill, not a tool, and why all MCP servers share two tools.</p></div>
+</section>
+
+<section class="page" data-page="context">
+  <p class="crumb">CORE CONCEPTS</p>
+  <h1>Context and cost</h1>
+  <p class="lede">Every request sends the model the whole conversation again. What you pay depends mostly on how much is sent, and how much of it the provider can reuse from its cache.</p>
+  <div class="tldr"><b>IN ONE LINE</b><span>Uno keeps the start of every request byte-for-byte the same, so the provider charges about a tenth for it after the first time.</span></div>
+
+  <h2>What one request holds</h2>
+  <figure class="fig" id="ctxsim">
+    <div class="bars">
+      <div class="barrow"><span class="turnlabel">turn 1</span>
+        <div class="track"><i class="sys cached"></i><i class="ins cached"></i><i class="sum cached"></i><i class="msg cached"></i><i class="tool"></i><span class="lim" style="left:90%"></span></div>
+        <span>window</span></div>
+    </div>
+    <input type="range" min="1" max="32" value="1" style="width:100%;margin-top:16px;accent-color:var(--accent)" aria-label="Turn">
+    <p class="steptext ctxnote"></p>
+    <div class="legend">
+      <span style="--c:#5b5b5b">system prompt and tools</span>
+      <span style="--c:#8a6d3b">AGENTS.md and memory</span>
+      <span style="--c:var(--accent)">summary</span>
+      <span style="--c:#3f6e57">messages</span>
+      <span style="--c:#2f4f63">tool output</span>
+      <span>striped = cached</span>
+    </div>
+    <figcaption><span>Drag the slider. The red line is where Uno starts shortening the conversation: about 20k tokens before the window is full. See <a href="#/compaction">Compaction</a>.</span></figcaption>
+  </figure>
+
+  <h2>Where the money goes</h2>
+  <ul>
+    <li><strong>The standing part.</strong> System prompt and tool descriptions: about 1,800 tokens, or about 3,500 with the provider's web search on. Claude Code sends about 46,000.</li>
+    <li><strong>Your project's part.</strong> <code>AGENTS.md</code>, the first 100 lines of memory, and the list of skills. Sent once, at the start, then cached.</li>
+    <li><strong>The conversation.</strong> Grows each turn. Tool output is the biggest part: a test log can be thousands of tokens.</li>
+  </ul>
+
+  <h2>How Uno keeps the cache warm</h2>
+  <ol>
+    <li><strong>Nothing early ever changes.</strong> The tool list is fixed for the session. Skills, plan mode and reminders arrive as new messages at the end, never as edits to the start.</li>
+    <li><strong>Project instructions go in the first user message,</strong> not the system prompt, so the system prompt is identical in every project and every session.</li>
+    <li><strong>On Anthropic</strong> Uno marks cache points on the tools, the system prompt and the newest message. On OpenAI it sends a stable cache key per session. Gemini caches on its own.</li>
+    <li><strong>Shortening reuses the cache too:</strong> the summary is asked for on the same cached prefix, with the same model.</li>
+  </ol>
+
+  <div class="ex"><div class="bar"><i></i><i></i><i></i>&nbsp;-P RUN · STATUS LINE</div><div class="term">
+    <div class="ln c">[done: 6 turns, 3912 in, 1104 out, 41280 cached, $0.0187, session a1f3…]</div>
+  </div></div>
+  <p>Every <code>-p</code> run with text output ends with this line on stderr. The cached figure is the part you paid about a tenth for. Illustrative numbers.</p>
+
+  <h2>Use cases</h2>
+  <div class="uses">
+    <div class="use"><h4>Cheap long sessions</h4><p>Stay in one chat for a related run of tasks: each turn reuses the cache from the last.</p><code class="run">uno --resume</code></div>
+    <div class="use"><h4>Leaner still</h4><p>Turn off provider search when you don't need it. It saves about 1,700 tokens a request on Anthropic.</p><code class="run">uno --no-search</code></div>
+  </div>
+
+  <div class="why"><b>DESIGN DECISION · M5, M7, M15</b><p>Append-only is a hard rule. Any change to the tools or system prompt mid-session throws the whole cache away, and the next request costs full price. So plan mode is a permission setting rather than a different tool list, MCP servers hide behind two fixed tools, and skills are read as files instead of being added to the prompt.</p></div>
+</section>
+
+<section class="page" data-page="compaction">
+  <p class="crumb">CORE CONCEPTS</p>
+  <h1>Compaction</h1>
+  <p class="lede">Every model has a limit on how much it can read at once: its context window. When a long conversation gets close, Uno shortens it so the work can carry on.</p>
+  <div class="tldr"><b>IN ONE LINE</b><span>First drop old tool output, then, if that is not enough, replace the conversation after your first message with a summary.</span></div>
+
+  <figure class="fig">
+    <svg viewBox="0 0 760 210" role="img" aria-label="A conversation bar fills up towards the window limit. Old tool output shrinks first, then everything after the first message folds into one summary block, followed by the recently touched files.">
+      <text class="s-s" x="20" y="22">BEFORE</text>
+      <line x1="640" y1="30" x2="640" y2="200" stroke="var(--accent)" stroke-width="2"/>
+      <text class="s-s" x="646" y="44">window limit</text>
+      <g transform="translate(20,34)">
+        <rect width="40" height="26" rx="4" fill="#5b5b5b"/>
+        <rect x="44" width="30" height="26" rx="4" fill="#8a6d3b"/>
+        <rect x="78" width="40" height="26" rx="4" fill="#3f6e57"/>
+        <rect x="122" width="130" height="26" rx="4" fill="#2f4f63"/>
+        <rect x="256" width="40" height="26" rx="4" fill="#3f6e57"/>
+        <rect x="300" width="150" height="26" rx="4" fill="#2f4f63"/>
+        <rect x="454" width="40" height="26" rx="4" fill="#3f6e57"/>
+        <rect x="498" width="110" height="26" rx="4" fill="#2f4f63"/>
+      </g>
+      <text class="s-s" x="20" y="96">STAGE 1 · prune old tool output</text>
+      <g transform="translate(20,106)">
+        <rect width="40" height="26" rx="4" fill="#5b5b5b"/>
+        <rect x="44" width="30" height="26" rx="4" fill="#8a6d3b"/>
+        <rect x="78" width="40" height="26" rx="4" fill="#3f6e57"/>
+        <rect x="122" height="26" rx="4" fill="#2f4f63"><animate attributeName="width" values="130;130;14;14" keyTimes="0;0.2;0.4;1" dur="6s" repeatCount="indefinite"/></rect>
+        <rect x="256" width="40" height="26" rx="4" fill="#3f6e57"><animate attributeName="x" values="256;256;140;140" keyTimes="0;0.2;0.4;1" dur="6s" repeatCount="indefinite"/></rect>
+        <rect x="300" height="26" rx="4" fill="#2f4f63"><animate attributeName="x" values="300;300;184;184" keyTimes="0;0.2;0.4;1" dur="6s" repeatCount="indefinite"/><animate attributeName="width" values="150;150;14;14" keyTimes="0;0.2;0.4;1" dur="6s" repeatCount="indefinite"/></rect>
+        <rect x="454" width="40" height="26" rx="4" fill="#3f6e57"><animate attributeName="x" values="454;454;202;202" keyTimes="0;0.2;0.4;1" dur="6s" repeatCount="indefinite"/></rect>
+        <rect x="498" width="110" height="26" rx="4" fill="#2f4f63"><animate attributeName="x" values="498;498;246;246" keyTimes="0;0.2;0.4;1" dur="6s" repeatCount="indefinite"/></rect>
+      </g>
+      <text class="s-s" x="20" y="166">STAGE 2 · all after your first message becomes one summary, plus recent files</text>
+      <g transform="translate(20,176)">
+        <rect width="40" height="26" rx="4" fill="#5b5b5b"/>
+        <rect x="44" width="30" height="26" rx="4" fill="#8a6d3b"/>
+        <rect x="78" width="30" height="26" rx="4" fill="#3f6e57"/>
+        <rect x="112" height="26" rx="4" fill="var(--accent)"><animate attributeName="width" values="190;190;190;64;64" keyTimes="0;0.4;0.6;0.8;1" dur="6s" repeatCount="indefinite"/></rect>
+        <rect width="70" height="26" rx="4" fill="#2f4f63"><animate attributeName="x" values="306;306;306;180;180" keyTimes="0;0.4;0.6;0.8;1" dur="6s" repeatCount="indefinite"/></rect>
+        <text class="s-s" x="118" y="17" fill="var(--page)" style="fill:var(--page)">summary</text>
+      </g>
+    </svg>
+    <figcaption><span>Stage one is free and usually enough. Stage two costs one model call.</span><button class="btn" data-replay>REPLAY</button></figcaption>
+  </figure>
+
+  <h2>What happens, in order</h2>
+  <ol>
+    <li><strong>Prune.</strong> Old tool output (file contents, test logs) is the bulk of most long conversations, and the model has already acted on it. Uno replaces old results with a short note. The newest ones stay.</li>
+    <li><strong>Summarise.</strong> If that is not enough, Uno asks the same model, on the same cached prefix, for a summary in fixed sections: the goal, decisions made, files touched, work still open, and the exact next step. The summary replaces everything after your first message, and the current text of up to five recently touched files is attached so the work can carry on.</li>
+    <li><strong>Carry on.</strong> Tool calls and their results always stay in pairs, and a resumed session loads the short history.</li>
+    <li><strong>Last resort.</strong> If even a summary will not fit, the run stops with <code>too_long</code>, the work so far saved, and tells you to start a new run with what is left.</li>
+  </ol>
+  <p>Type <code>/compact</code> to shorten now, for example before starting the next part of a big task. <code>--window &lt;tokens&gt;</code> sets the window for a model Uno does not know, or makes shortening happen earlier.</p>
+
+  <h2>Use cases</h2>
+  <div class="uses">
+    <div class="use"><h4>A long migration</h4><p>Hours of edits and test runs in one chat. The old logs get pruned, the plan and decisions survive in the summary.</p><code class="run">uno</code></div>
+    <div class="use"><h4>Before the next chapter</h4><p>Finished one feature, starting another in the same chat? Compact first so the new work starts lean.</p><code class="run">/compact</code></div>
+  </div>
+
+  <div class="why"><b>DESIGN DECISION · M8, M9, M10</b><p>Summarise with the same model on the same prefix, not a cheaper model: the cached prefix makes it cheap anyway, and a cheaper model forgets more. Prune before summarising, because dropping old output loses almost nothing and costs nothing. Use fixed sections, because free-form summaries quietly drop the things you need later.</p></div>
+</section>
+
+<section class="page" data-page="sessions">
+  <p class="crumb">CORE CONCEPTS</p>
+  <h1>Sessions and undo</h1>
+  <p class="lede">Every conversation is saved as it happens, one line per message. Every file change is snapshotted before it is made. So you can come back to any conversation, branch it, or put your files back.</p>
+  <div class="tldr"><b>IN ONE LINE</b><span><code>--resume</code> continues, <code>--fork</code> branches, <code>undo</code> puts files back.</span></div>
+
+  <figure class="fig">
+    <svg viewBox="0 0 760 190" role="img" aria-label="A session is a line of messages. Resume adds to the end. Fork copies it and continues the copy on a branch, leaving the original untouched.">
+      <text class="s-s" x="20" y="24">session a1f3 · one line per message, appended as it happens</text>
+      <line class="s-line" x1="40" y1="70" x2="440" y2="70"/>
+      <g fill="var(--str)">
+        <circle cx="60" cy="70" r="7"/><circle cx="120" cy="70" r="7"/><circle cx="180" cy="70" r="7"/><circle cx="240" cy="70" r="7"/>
+      </g>
+      <text class="s-s" x="44" y="98">meta</text>
+      <circle cx="300" cy="70" r="7" class="s-dot" opacity="0"><animate attributeName="opacity" values="0;0;1;1" keyTimes="0;0.15;0.2;1" dur="6s" repeatCount="indefinite"/></circle>
+      <circle cx="360" cy="70" r="7" class="s-dot" opacity="0"><animate attributeName="opacity" values="0;0;1;1" keyTimes="0;0.3;0.35;1" dur="6s" repeatCount="indefinite"/></circle>
+      <text class="s-s" x="300" y="98">--resume adds here</text>
+      <path class="s-dash" d="M240,70 C270,70 270,140 300,140 L460,140"/>
+      <circle cx="320" cy="140" r="7" class="s-dot ok" opacity="0"><animate attributeName="opacity" values="0;0;1;1" keyTimes="0;0.5;0.55;1" dur="6s" repeatCount="indefinite"/></circle>
+      <circle cx="380" cy="140" r="7" class="s-dot ok" opacity="0"><animate attributeName="opacity" values="0;0;1;1" keyTimes="0;0.65;0.7;1" dur="6s" repeatCount="indefinite"/></circle>
+      <circle cx="440" cy="140" r="7" class="s-dot ok" opacity="0"><animate attributeName="opacity" values="0;0;1;1" keyTimes="0;0.8;0.85;1" dur="6s" repeatCount="indefinite"/></circle>
+      <text class="s-s" x="320" y="168">--fork a1f3: a new session, the original untouched</text>
+      <rect class="s-box" x="530" y="40" width="210" height="120" rx="10"/>
+      <text class="s-t" x="546" y="64">UNDO STACK</text>
+      <g class="s-s"><text x="546" y="88">3 edit src/api.ts</text><text x="546" y="108">2 write src/api.test.ts</text><text x="546" y="128">1 edit README.md</text></g>
+      <rect x="540" y="76" width="190" height="18" rx="4" fill="var(--accent)" opacity="0"><animate attributeName="opacity" values="0;0;0.25;0" keyTimes="0;0.85;0.92;1" dur="6s" repeatCount="indefinite"/></rect>
+      <text class="s-s" x="546" y="150">/undo pops the top</text>
+    </svg>
+    <figcaption><span>Resume grows the line; fork starts a new one from a copy; undo walks back the file snapshots.</span><button class="btn" data-replay>REPLAY</button></figcaption>
+  </figure>
+
+  <h2>Commands</h2>
+<pre><code>uno sessions                         # this folder's sessions: id, age, messages, first prompt
+uno --resume                         # continue the newest
+uno --resume a1f3 -p "now add docs"  # continue a given one, as a one-shot run
+uno --fork a1f3 -p "try it with a cache instead"   # branch, original unchanged
+uno undo                             # put back the newest file change
+uno undo --all                       # put back every change of the newest session
+uno undo --force                     # even if something else changed the file since</code></pre>
+  <p>In the chat: <code>/sessions</code>, <code>/resume</code>, <code>/fork</code>, <code>/undo</code>, <code>/undo all</code>.</p>
+
+  <h2>What undo covers, and what it does not</h2>
+  <ul>
+    <li><strong>Covered:</strong> every change made with <code>write</code>, <code>edit</code> or <code>apply_patch</code>, including changes to long-term memory.</li>
+    <li><strong>Not covered:</strong> files changed by shell commands (<code>sed -i</code>, <code>mv</code>, a code generator). Uno tells the model to change files with its file tools for this reason. If a command changed a file since, undo stops and names <code>--force</code>.</li>
+    <li><strong>Safe with your own edits:</strong> if you changed the file after Uno did, undo refuses rather than overwrite your work.</li>
+  </ul>
+
+  <h2>Use cases</h2>
+  <div class="uses">
+    <div class="use"><h4>Pick up tomorrow</h4><p>Close the terminal. Tomorrow, the whole conversation is still there.</p><code class="run">uno --resume</code></div>
+    <div class="use"><h4>Try two approaches</h4><p>Fork once for each idea, compare the diffs, keep the better one.</p><code class="run">uno --fork a1f3 -p "use a trie instead"</code></div>
+    <div class="use"><h4>Bad idea, roll back</h4><p>The refactor went sideways. Undo the whole session's file changes in one go.</p><code class="run">uno undo --all</code></div>
+    <div class="use"><h4>A crash mid-task</h4><p>A session cut off mid-tool-call resumes cleanly: the unfinished calls are marked interrupted.</p><code class="run">uno --resume</code></div>
+  </div>
+
+  <div class="why"><b>DESIGN DECISION · D4, M16, M17</b><p>Sessions are plain append-only JSONL, one message per line with an id and parent id. Resume is "read the lines", fork is "copy the file", and a crash loses at most one half-written line. Undo uses a snapshot before each file-tool change rather than a shadow git repo: cheap, always on, and honest about what it cannot cover.</p></div>
+</section>
+
+<section class="page" data-page="screen">
+  <p class="crumb">CORE CONCEPTS</p>
+  <h1>The Dot screen</h1>
+  <p class="lede">The chat fills the terminal and is drawn in dots with one accent colour. Cards across the top show what Uno is doing, how full the context is and what has been spent.</p>
+  <div class="tldr"><b>IN ONE LINE</b><span>Cards on top, conversation below, permission questions at the bottom. Prefer your terminal's own scrollback? Use <code>--screen chat</code>.</span></div>
+
+  <figure class="fig">
+    <div class="tui">
+      <div class="strip">
+        <div><small>UNO</small><b>my-app</b> · main</div>
+        <div><small>02 AGENT</small><b>editing</b> src/api.ts</div>
+        <div><small>03 CONTEXT</small><b>38%</b> of 200k<div class="meter"><i style="width:38%"></i></div></div>
+        <div><small>04 BUDGET</small><b>$0.04</b> of $5.00<div class="meter"><i style="width:8%"></i></div></div>
+      </div>
+      <div>› add retry with backoff to the api client</div>
+      <div style="color:var(--dim)">● read src/api.ts</div>
+      <div style="color:var(--dim)">● edit src/api.ts (+18 −3)</div>
+      <div class="ask">Allow this edit to src/api.ts?&nbsp;&nbsp;<span class="opt on">y once</span><span class="opt">a all edits</span><span class="opt">n no</span></div>
+    </div>
+    <figcaption><span>A mock of the screen mid-task. Choose with ← → and Enter, or press y, a or n.</span></figcaption>
+  </figure>
+
+  <h2>The parts</h2>
+  <ul>
+    <li><strong>The welcome.</strong> A new chat opens on Uno in large dots, then cards on this folder (branch, the instruction files and skills Uno read), the guards (mode, sandbox, trust, undo) and the budget.</li>
+    <li><strong>The strip.</strong> From the first prompt, four cards run across the top: UNO, 02 AGENT, 03 CONTEXT, 04 BUDGET. Under 24 rows they fold to one line.</li>
+    <li><strong>The question.</strong> A permission question opens at the bottom of the conversation.</li>
+    <li><strong>Leaving.</strong> The conversation is printed into the terminal, so your scrollback keeps it.</li>
+  </ul>
+
+  <h2>The scrolling chat</h2>
+  <p>The full screen takes over your terminal's scrollback, selection and search while it is open. If you would rather keep those, the scrolling chat has the same look in plain output, and <code>/status</code>, <code>/context</code> and <code>/budget</code> print the cards on demand.</p>
+<pre><code>uno --screen chat                      # once
+export UNO_SCREEN=chat                 # this shell
+{ "ui": { "screen": "chat", "accent": "yellow" } }   # always, in ~/.config/uno/settings.json</code></pre>
+  <p><code>accent</code> is <code>red</code> or <code>yellow</code>. Windows smaller than 80 × 14 always get the scrolling chat. <code>NO_COLOR</code> keeps the dots and drops colour.</p>
+
+  <div class="why"><b>DESIGN DECISION · D29 → D35, D37</b><p>Uno started as a plain scrolling chat, so copy and search worked like any terminal program. Mockups showed that a full screen with live cards made the agent's state readable at a glance, so it became the default, with the scrolling chat one setting away. Cards moved from the side to a strip on top when most real windows turned out too narrow for a sidebar.</p></div>
+</section>
+
+<section class="page" data-page="providers">
+  <p class="crumb">CORE CONCEPTS</p>
+  <h1>Providers and models</h1>
+  <p class="lede">Uno speaks four model APIs directly. You pick a model by name; Uno works out which provider serves it.</p>
+  <div class="tldr"><b>IN ONE LINE</b><span><code>--model</code> picks the model; add <code>--provider openai-compat --base-url …</code> for anything else that speaks OpenAI's chat format.</span></div>
+
+  <table>
+    <thead><tr><th>Provider</th><th>Key</th><th>Caching</th><th>Web search</th></tr></thead>
+    <tbody>
+      <tr><td>Anthropic</td><td><code>ANTHROPIC_API_KEY</code></td><td>explicit cache points</td><td>yes</td></tr>
+      <tr><td>OpenAI</td><td><code>OPENAI_API_KEY</code></td><td>automatic, stable key per session</td><td>yes</td></tr>
+      <tr><td>Gemini</td><td><code>GOOGLE_API_KEY</code> or <code>GEMINI_API_KEY</code></td><td>automatic</td><td>Gemini 3 models</td></tr>
+      <tr><td>OpenAI-compatible</td><td><code>OPENAI_COMPAT_API_KEY</code></td><td>none assumed</td><td>no</td></tr>
+    </tbody>
+  </table>
+  <p>The default model is <code>claude-sonnet-5</code>. Gemini support is built but not yet tested against the live service.</p>
+
+  <h2>Examples</h2>
+<pre><code>uno --model claude-haiku-4-5                        # cheap and quick
+uno --model gpt-6-luna                              # OpenAI
+uno --provider openai-compat --base-url http://localhost:11434/v1 --model qwen3   # a local server
+/model claude-sonnet-5                              # in the chat, from the next turn</code></pre>
+  <p>Keys are read from the environment, then a <code>.env</code> in the folder you run <code>uno</code> in, then <code>~/.config/uno/.env</code>. Your keys are never passed to hooks, MCP servers or helper processes.</p>
+
+  <h2>Use cases</h2>
+  <div class="uses">
+    <div class="use"><h4>Cheap model for chores</h4><p>Renames, docs, small tests: a small model does them for a fraction of the price.</p><code class="run">uno --model claude-haiku-4-5 -p "add docstrings to src/util"</code></div>
+    <div class="use"><h4>Keep code on your machine</h4><p>Point Uno at a model server on your own machine or network.</p><code class="run">uno --provider openai-compat --base-url http://gpu-box:8000/v1 --model qwen3</code></div>
+  </div>
+
+  <div class="why"><b>DESIGN DECISION · D2, D3, D7</b><p>No vendor SDKs. Each provider has a thin adapter that turns Uno's one internal message format into that provider's JSON and back, over plain HTTPS. The agent loop never sees provider-specific shapes, so adding a provider never touches the loop, and the binary stays about 3 MB.</p></div>
+</section>
+
+<!-- ============================== SAFETY ============================== -->
+
+<section class="page" data-page="safety">
+  <p class="crumb">SAFETY</p>
+  <h1>The safety model</h1>
+  <p class="lede">A coding agent runs commands a model chose, on your machine. Uno puts five layers between the model and your machine, and is plain about what each one does not stop.</p>
+  <div class="tldr"><b>IN ONE LINE</b><span>Trust gate, rules, mode, sandbox, then undo and the spending cap behind them. Deny always wins.</span></div>
+
+  <figure class="fig">
+    <svg viewBox="0 0 760 250" role="img" aria-label="Three tool calls travel through five gates: trust, rules, mode, sandbox, run. One is stopped by a deny rule, one waits for you at the mode gate, one runs in the sandbox.">
+      <path id="sf1" class="s-dash" d="M20,70 L740,70"/>
+      <path id="sf2" class="s-dash" d="M20,130 L740,130"/>
+      <path id="sf3" class="s-dash" d="M20,190 L740,190"/>
+      <g>
+        <rect class="s-box" x="120" y="34" width="86" height="190" rx="10"/><text class="s-t" x="163" y="26" text-anchor="middle">TRUST</text>
+        <rect class="s-box" x="250" y="34" width="86" height="190" rx="10"/><text class="s-t" x="293" y="26" text-anchor="middle">RULES</text>
+        <rect class="s-box" x="380" y="34" width="86" height="190" rx="10"/><text class="s-t" x="423" y="26" text-anchor="middle">MODE</text>
+        <rect class="s-box hot" x="510" y="34" width="86" height="190" rx="10"/><text class="s-t" x="553" y="26" text-anchor="middle">SANDBOX</text>
+        <rect class="s-box ok" x="640" y="34" width="100" height="190" rx="10"/><text class="s-t" x="690" y="26" text-anchor="middle">RUN</text>
+      </g>
+      <text class="s-s" x="20" y="60">git push</text>
+      <text class="s-s" x="20" y="120">edit api.ts</text>
+      <text class="s-s" x="20" y="180">cargo test</text>
+      <circle r="6" class="s-dot"><animateMotion dur="6s" repeatCount="indefinite" keyPoints="0;0.4;0.4" keyTimes="0;0.35;1" calcMode="linear"><mpath href="#sf1"/></animateMotion></circle>
+      <g opacity="0"><animate attributeName="opacity" values="0;0;1;1" keyTimes="0;0.35;0.38;1" dur="6s" repeatCount="indefinite"/><line class="s-x" x1="300" y1="58" x2="324" y2="82"/><line class="s-x" x1="324" y1="58" x2="300" y2="82"/><text class="s-s" x="270" y="100">deny: bash(git push)</text></g>
+      <circle r="6" class="s-dot w"><animateMotion dur="6s" repeatCount="indefinite" keyPoints="0;0.58;0.58;1;1" keyTimes="0;0.4;0.65;0.85;1" calcMode="linear"><mpath href="#sf2"/></animateMotion></circle>
+      <g opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.4;0.45;0.65;1" dur="6s" repeatCount="indefinite"/><text class="s-s" x="392" y="160" style="fill:var(--warn)">asks you… y</text></g>
+      <circle r="6" class="s-dot ok"><animateMotion dur="6s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.6;1" calcMode="linear"><mpath href="#sf3"/></animateMotion></circle>
+      <g opacity="0"><animate attributeName="opacity" values="0;0;1;1" keyTimes="0;0.6;0.63;1" dur="6s" repeatCount="indefinite"/><path class="s-ok" d="M700,206 l6,6 l12,-14"/></g>
+    </svg>
+    <figcaption><span>Every tool call passes the same gates in the same order. The first "no" ends it.</span><button class="btn" data-replay>REPLAY</button></figcaption>
+  </figure>
+
+  <h2>The layers</h2>
+  <table>
+    <thead><tr><th>Layer</th><th>Stops</th><th>Page</th></tr></thead>
+    <tbody>
+      <tr><td>Trust gate</td><td>A cloned repo's own settings, hooks and MCP servers from taking effect until you say so</td><td><a href="#/trust">Trust</a></td></tr>
+      <tr><td>Rules</td><td>Calls you have forbidden (<code>deny</code>), or want asked about (<code>ask</code>)</td><td><a href="#/permissions">Permissions</a></td></tr>
+      <tr><td>Mode</td><td>Edits and risky commands without your say-so</td><td><a href="#/permissions">Permissions</a></td></tr>
+      <tr><td>Sandbox</td><td>Shell commands writing outside the project, reading secrets, reaching the network</td><td><a href="#/sandbox">Sandbox</a></td></tr>
+      <tr><td>Undo</td><td>A bad file change from being permanent</td><td><a href="#/sessions">Sessions and undo</a></td></tr>
+      <tr><td>Spending cap</td><td>A runaway loop from running up a bill</td><td><a href="#/spending">Spending cap</a></td></tr>
+    </tbody>
+  </table>
+
+  <h2>Always true, in every mode</h2>
+  <ul>
+    <li><code>.env</code> files and key files are never read by Uno's file tools.</li>
+    <li>Changes under <code>.git/</code>, <code>.uno/</code> and <code>.claude/</code> ask, because they steer the tools themselves. With <code>-p</code> they are refused, plan mode refuses them, and only bypass mode lets them through.</li>
+    <li>The model cannot run <code>uno trust</code> for itself, even in bypass mode.</li>
+    <li>A <code>deny</code> rule holds even in bypass mode.</li>
+    <li>Your API keys never reach hooks, MCP servers or the model.</li>
+    <li>Web pages, MCP results and recalled sessions are marked to the model as data, not instructions.</li>
+  </ul>
+
+  <h2>What it does not stop</h2>
+  <div class="warn"><b>READ THIS ONCE</b>
+    <p><strong>A command you allow runs unconfined.</strong> <code>--allow "bash(npm install)"</code> lets that command run outside the sandbox, on your machine, with your network. Keep rules narrow.</p>
+    <p><strong>The model can be talked into things.</strong> A malicious README or web page can try to steer it. The gates limit what it can do, not what it wants to do; read what you approve.</p>
+    <p><strong>Shell changes are not undoable.</strong> Only changes made with Uno's file tools are snapshotted.</p>
+    <p><strong>MCP servers and hooks run outside the sandbox.</strong> They are programs you chose to run; trust them as you would any program.</p>
+    <p><strong>Linux and Windows are less tested.</strong> The macOS sandbox has run for real; Linux needs bubblewrap; Windows has no sandbox yet.</p>
+  </div>
+
+  <div class="why"><b>DESIGN DECISION · F, D14, D26</b><p>Several thin layers, each easy to reason about, rather than one clever classifier. The order is fixed (trust, then rules, then mode, then sandbox), so you can always predict the outcome. The network is off in the sandbox by default because exfiltration is the worst thing a tricked model can do.</p></div>
+</section>
+
+<section class="page" data-page="permissions">
+  <p class="crumb">SAFETY</p>
+  <h1>Permissions and modes</h1>
+  <p class="lede">The mode sets how much Uno does without asking. Rules carve exceptions: things that always run, always ask (except in bypass mode), or never run.</p>
+  <div class="tldr"><b>IN ONE LINE</b><span><code>deny</code> beats <code>ask</code> beats <code>allow</code>; whatever no rule covers, the mode decides.</span></div>
+
+  <h2>Try the modes</h2>
+  <figure class="fig" id="modes">
+    <div class="seg">
+      <button data-mode="default">default</button>
+      <button data-mode="accept-edits">accept-edits</button>
+      <button data-mode="plan">plan</button>
+      <button data-mode="bypass">bypass</button>
+    </div>
+    <div class="matrix">
+      <div><small>READ AND SEARCH</small><b></b></div>
+      <div><small>EDITS IN THE PROJECT</small><b></b></div>
+      <div><small>SANDBOXED COMMANDS</small><b></b></div>
+      <div><small>OUTSIDE THE SANDBOX</small><b></b></div>
+    </div>
+    <p class="steptext mdesc"></p>
+    <figcaption><span>Switch with <code>--mode</code>, or <code>/mode</code> in the chat. The chat starts in default; <code>-p</code> starts in accept-edits.</span></figcaption>
+  </figure>
+
+  <h2>Answering a question</h2>
+  <table>
+    <thead><tr><th>Key</th><th>Means</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>y</kbd></td><td>Yes, this once</td></tr>
+      <tr><td><kbd>a</kbd></td><td>Yes for the rest of the session: on an edit, every file change in the project; on a command, every command that starts the same way; on a web fetch, that site</td></tr>
+      <tr><td><kbd>n</kbd></td><td>No. The model is told, and finds another way or asks you</td></tr>
+    </tbody>
+  </table>
+  <p>For MCP calls there are more: <kbd>a</kbd> this tool, <kbd>s</kbd> every tool on this server, <kbd>m</kbd> every MCP tool, for the session.</p>
+
+  <h2>Try the rules</h2>
+  <figure class="fig" id="tester">
+    <div class="tester">
+<pre><code>{
+  "permissions": {
+    "allow": ["bash(cargo test)",
+              "bash(npm run lint)",
+              "web_fetch(docs.rs)"],
+    "ask":   ["bash(git commit)"],
+    "deny":  ["bash(git push)",
+              "bash(rm -rf)",
+              "web_fetch(*.internal)"]
+  }
+}</code></pre>
+      <div class="calls">
+        <button data-tool="bash" data-arg="git push origin main">bash: git push origin main</button>
+        <button data-tool="bash" data-arg="cargo test -p core">bash: cargo test -p core</button>
+        <button data-tool="bash" data-arg="git commit -m wip">bash: git commit -m wip</button>
+        <button data-tool="bash" data-arg="ls src">bash: ls src</button>
+        <button data-tool="web_fetch" data-arg="docs.rs">web_fetch: docs.rs/serde</button>
+        <button data-tool="web_fetch" data-arg="wiki.corp.internal">web_fetch: wiki.corp.internal</button>
+        <button data-tool="web_fetch" data-arg="example.com">web_fetch: example.com</button>
+        <button data-tool="edit" data-arg="src/main.rs">edit: src/main.rs</button>
+        <button data-tool="read" data-arg="src/main.rs">read: src/main.rs</button>
+      </div>
+    </div>
+    <div class="verdict"></div>
+    <figcaption><span>Pick a call to see which rule decides it. A simplified model of the real matcher.</span></figcaption>
+  </figure>
+
+  <h2>Writing rules</h2>
+  <ul>
+    <li><code>tool</code> covers every call of a tool: <code>web_fetch</code>, <code>bash</code>, <code>edit</code>.</li>
+    <li><code>bash(cargo test)</code> covers commands that start with those words. Pipes and <code>&amp;&amp;</code> are split, and each command must be covered.</li>
+    <li><code>web_fetch(*.github.com)</code> covers the subdomains of github.com; add <code>web_fetch(github.com)</code> for the site itself.</li>
+    <li><code>mcp__github__create_issue</code>, <code>mcp__github</code> or <code>mcp</code> cover one MCP tool, a server, or all of them.</li>
+    <li>Claude Code's <code>WebFetch(domain:docs.rs)</code> spelling works too.</li>
+  </ul>
+  <p>Rules live in <code>permissions</code> in <code>~/.config/uno/settings.json</code>, or in a trusted project's <code>.uno/settings.json</code>. For one run, use <code>--allow</code>:</p>
+<pre><code>uno -p "fix the lint errors" --allow "bash(npm run lint)"</code></pre>
+
+  <h2>Use cases</h2>
+  <div class="uses">
+    <div class="use"><h4>Look but don't touch</h4><p>Exploring a codebase you don't own, or planning a big change first.</p><code class="run">uno --mode plan</code></div>
+    <div class="use"><h4>Trust the edits, watch the commands</h4><p>You will review with git diff anyway.</p><code class="run">uno --mode accept-edits</code></div>
+    <div class="use"><h4>Never push</h4><p>One rule, in every mode, even bypass.</p><code class="run">"deny": ["bash(git push)"]</code></div>
+    <div class="use"><h4>A throwaway container</h4><p>Nothing to protect inside it. Deny rules still hold.</p><code class="run">uno --dangerously-skip-permissions</code></div>
+  </div>
+
+  <div class="why"><b>DESIGN DECISION · D31, R9</b><p><kbd>a</kbd> covers the whole group (all edits, or one command prefix) because answering once per file was tiring enough that people stopped reading the questions. Plan mode is a permission mode, denied at the moment of the call, rather than a different set of tools, so switching to it does not throw away the prompt cache.</p></div>
+</section>
+
+<section class="page" data-page="sandbox">
+  <p class="crumb">SAFETY</p>
+  <h1>The sandbox</h1>
+  <p class="lede">Shell commands run inside the operating system's own sandbox: Seatbelt on macOS, bubblewrap on Linux. Inside it, a command can work on your project and nothing else.</p>
+  <div class="tldr"><b>IN ONE LINE</b><span>Write the project and temp. Read no secrets. No network. Because of that, sandboxed commands run without asking.</span></div>
+
+  <figure class="fig">
+    <svg viewBox="0 0 760 260" role="img" aria-label="A command inside the sandbox can write to the project and temp folders. Attempts to write to the home folder, read ~/.ssh or reach the network bounce off the sandbox wall.">
+      <rect class="s-wall" x="190" y="24" width="380" height="212" rx="18"/>
+      <text class="s-s" x="206" y="44" style="fill:var(--accent)">SANDBOX</text>
+      <rect class="s-box" x="300" y="100" width="160" height="56" rx="10"/>
+      <text class="s-t" x="380" y="124" text-anchor="middle">cargo test</text>
+      <text class="s-s" x="380" y="144" text-anchor="middle">a shell command</text>
+      <rect class="s-box ok" x="210" y="180" width="130" height="40" rx="8"/><text class="s-s" x="275" y="205" text-anchor="middle">./ project ✓</text>
+      <rect class="s-box ok" x="420" y="180" width="130" height="40" rx="8"/><text class="s-s" x="485" y="205" text-anchor="middle">/tmp ✓</text>
+      <rect class="s-box" x="20" y="40" width="130" height="40" rx="8"/><text class="s-s" x="85" y="65" text-anchor="middle">~/.ssh  ~/.aws</text>
+      <rect class="s-box" x="20" y="180" width="130" height="40" rx="8"/><text class="s-s" x="85" y="205" text-anchor="middle">~/ home folder</text>
+      <rect class="s-box" x="610" y="40" width="130" height="40" rx="8"/><text class="s-s" x="675" y="65" text-anchor="middle">network</text>
+      <rect class="s-box" x="610" y="180" width="130" height="40" rx="8"/><text class="s-s" x="675" y="205" text-anchor="middle">.env files</text>
+      <path id="sb1" d="M300,120 L196,64"/><path id="sb2" d="M300,140 L196,196"/><path id="sb3" d="M460,120 L564,64"/><path id="sb4" d="M460,140 L564,196"/>
+      <path id="sb5" d="M340,156 L290,180"/><path id="sb6" d="M420,156 L470,180"/>
+      <circle r="5" class="s-dot"><animateMotion dur="2.4s" repeatCount="indefinite" keyPoints="0;1;0.7" keyTimes="0;0.6;1" calcMode="linear"><mpath href="#sb1"/></animateMotion></circle>
+      <circle r="5" class="s-dot" opacity="0"><animateMotion dur="2.4s" begin="0.6s" repeatCount="indefinite" keyPoints="0;1;0.7" keyTimes="0;0.6;1" calcMode="linear"><mpath href="#sb2"/></animateMotion><set attributeName="opacity" to="1" begin="0.6s"/></circle>
+      <circle r="5" class="s-dot" opacity="0"><animateMotion dur="2.4s" begin="1.2s" repeatCount="indefinite" keyPoints="0;1;0.7" keyTimes="0;0.6;1" calcMode="linear"><mpath href="#sb3"/></animateMotion><set attributeName="opacity" to="1" begin="1.2s"/></circle>
+      <circle r="5" class="s-dot" opacity="0"><animateMotion dur="2.4s" begin="1.8s" repeatCount="indefinite" keyPoints="0;1;0.7" keyTimes="0;0.6;1" calcMode="linear"><mpath href="#sb4"/></animateMotion><set attributeName="opacity" to="1" begin="1.8s"/></circle>
+      <circle r="5" class="s-dot ok"><animateMotion dur="1.6s" repeatCount="indefinite"><mpath href="#sb5"/></animateMotion></circle>
+      <circle r="5" class="s-dot ok" opacity="0"><animateMotion dur="1.6s" begin="0.8s" repeatCount="indefinite"><mpath href="#sb6"/></animateMotion><set attributeName="opacity" to="1" begin="0.8s"/></circle>
+    </svg>
+    <figcaption><span>Green gets through. Red bounces off the wall: the operating system refuses, whatever the command tries.</span><button class="btn" data-replay>REPLAY</button></figcaption>
+  </figure>
+
+  <h2>Inside the sandbox, a command</h2>
+  <ul>
+    <li><strong>can</strong> read your files and write inside the project and temporary folders;</li>
+    <li><strong>cannot</strong> write anywhere else: not your home folder (except package and build caches such as <code>~/.cargo/registry</code>, <code>~/.npm</code> and <code>~/.cache</code>), not Uno's own settings, and not <code>.git/hooks</code>, <code>.uno</code> or <code>.claude</code> inside the project;</li>
+    <li><strong>cannot</strong> read <code>.env</code> files or credential folders such as <code>~/.ssh</code> and <code>~/.aws</code>;</li>
+    <li><strong>cannot</strong> reach the network.</li>
+  </ul>
+
+  <h2>When a command needs more</h2>
+  <p>Installing packages needs the network. The model can ask to run a command outside the sandbox, and that always asks you:</p>
+  <div class="ex"><div class="bar"><i></i><i></i><i></i>&nbsp;UNO</div><div class="term">
+    <div class="ln t">bash npm install zod   (outside the sandbox)</div>
+    <div class="ln q">`npm install zod` would run outside the sandbox. Allow?  y · a · n</div>
+  </div></div>
+  <ul>
+    <li><code>--allow "bash(npm install)"</code> or a rule lets that command run unconfined without asking. Keep it narrow.</li>
+    <li><code>--no-sandbox</code> turns the sandbox off for a run; every command then asks.</li>
+    <li><code>"sandbox": {"enabled": false}</code> in settings does the same, always.</li>
+  </ul>
+
+  <h2>Use cases</h2>
+  <div class="uses">
+    <div class="use"><h4>Let it run the tests freely</h4><p>Tests, builds, linters: all local, so all sandboxed, so no questions.</p><code class="run">uno -p "make the failing tests pass"</code></div>
+    <div class="use"><h4>Install one thing</h4><p>Allow just that command, just this run.</p><code class="run">uno --allow "bash(cargo add)"</code></div>
+  </div>
+
+  <div class="why"><b>DESIGN DECISION · D14</b><p>Network off by default, ask to allow. Most of what a coding agent runs (tests, builds, greps) needs no network, and the worst outcome of a tricked model is sending your code or keys somewhere. The operating system enforces it, not the prompt, so no clever wording gets around it.</p></div>
+</section>
+
+<section class="page" data-page="trust">
+  <p class="crumb">SAFETY</p>
+  <h1>Trust</h1>
+  <p class="lede">A project can carry its own Uno settings, hooks and MCP servers. Those are code that runs on your machine, so they take effect only in folders you have trusted.</p>
+  <div class="tldr"><b>IN ONE LINE</b><span>Clone a repo, read its <code>.uno/</code> folder, run <code>uno trust</code>. Change those files, and you trust again.</span></div>
+
+  <figure class="fig">
+    <svg viewBox="0 0 760 170" role="img" aria-label="A project's settings, hooks and MCP servers wait behind a gate until uno trust. Instruction files and skills always pass, because they are just text.">
+      <rect class="s-box" x="20" y="20" width="200" height="130" rx="12"/>
+      <text class="s-t" x="36" y="44">CLONED REPO</text>
+      <g class="s-s"><text x="36" y="70">.uno/settings.json</text><text x="36" y="90">.mcp.json</text><text x="36" y="110">hooks</text><text x="36" y="134" style="fill:var(--ok)">AGENTS.md · skills</text></g>
+      <rect x="360" y="20" width="16" height="130" rx="4" fill="var(--accent)"><animate attributeName="height" values="130;130;0;0;130" keyTimes="0;0.4;0.5;0.9;1" dur="7s" repeatCount="indefinite"/></rect>
+      <text class="s-s" x="330" y="166">uno trust</text>
+      <path id="tr1" class="s-dash" d="M220,80 L600,80"/>
+      <path id="tr2" class="s-dash" d="M220,128 L600,128"/>
+      <circle r="6" class="s-dot w"><animateMotion dur="7s" repeatCount="indefinite" keyPoints="0;0.36;0.36;1;1" keyTimes="0;0.2;0.5;0.7;1" calcMode="linear"><mpath href="#tr1"/></animateMotion></circle>
+      <circle r="6" class="s-dot ok"><animateMotion dur="3.5s" repeatCount="indefinite"><mpath href="#tr2"/></animateMotion></circle>
+      <rect class="s-box ok" x="600" y="20" width="140" height="130" rx="12"/>
+      <text class="s-t" x="670" y="90" text-anchor="middle">IN EFFECT</text>
+    </svg>
+    <figcaption><span>Text (instructions, skills) always flows. Code (settings, hooks, servers) waits for your say-so.</span><button class="btn" data-replay>REPLAY</button></figcaption>
+  </figure>
+
+<pre><code>uno trust             # trust this folder's settings, hooks and MCP servers as they are now
+uno trust --status    # trusted? changed since?
+uno trust --remove    # stop trusting it</code></pre>
+  <ul>
+    <li>Trust is recorded against a fingerprint of those files. If any of them change, the folder is untrusted until you look and trust again.</li>
+    <li>An untrusted folder says what it declares, for example how many MCP servers, so you know what you are missing.</li>
+    <li>Instruction files and skills load without trust: they are text, and whatever they lead the model to do still goes through the guard.</li>
+    <li>The model cannot run <code>uno trust</code> for itself, in any mode.</li>
+  </ul>
+
+  <h2>Use cases</h2>
+  <div class="uses">
+    <div class="use"><h4>Your team shares a setup</h4><p>Commit <code>.uno/settings.json</code> with the test command allowed and a lint hook. Each teammate trusts once.</p><code class="run">uno trust</code></div>
+    <div class="use"><h4>A stranger's repo</h4><p>Don't trust it. Uno still reads its AGENTS.md and works normally, with your own settings.</p><code class="run">uno --mode plan</code></div>
+  </div>
+
+  <div class="why"><b>DESIGN DECISION · F</b><p>Cloning a repo should never be enough to run its code. A project's hooks and MCP servers are programs written by whoever wrote the repo. The fingerprint means a later <code>git pull</code> that adds a hook does not slip in under an old "yes".</p></div>
+</section>
+
+<section class="page" data-page="spending">
+  <p class="crumb">SAFETY</p>
+  <h1>The spending cap</h1>
+  <p class="lede">Every model call is checked against a cap before it is sent and recorded after it returns. When the next call would go over, Uno stops.</p>
+  <div class="tldr"><b>IN ONE LINE</b><span>$5.00 in total until you raise it with <code>UNO_SPEND_CAP_USD</code>; <code>--max-cost</code> for a single run.</span></div>
+
+  <figure class="fig">
+    <svg viewBox="0 0 760 120" role="img" aria-label="A spend meter fills in steps, one per model call, and stops at the cap line.">
+      <rect x="20" y="40" width="680" height="34" rx="8" class="s-fill"/>
+      <rect x="20" y="40" height="34" rx="8" fill="var(--accent)" opacity="0.8"><animate attributeName="width" values="0;80;80;190;190;330;330;470;470;600;600;600" keyTimes="0;0.06;0.14;0.2;0.28;0.36;0.44;0.52;0.6;0.68;0.95;1" dur="8s" repeatCount="indefinite"/></rect>
+      <line x1="640" y1="30" x2="640" y2="84" stroke="var(--str)" stroke-width="2" stroke-dasharray="3 3"/>
+      <text class="s-s" x="646" y="26">cap</text>
+      <text class="s-s" x="20" y="104">each step is one model call · the next call would cross the line, so it is never sent</text>
+      <g opacity="0"><animate attributeName="opacity" values="0;0;1;1" keyTimes="0;0.7;0.74;1" dur="8s" repeatCount="indefinite"/><text class="s-t" x="560" y="62" style="fill:var(--page)">STOP</text></g>
+    </svg>
+    <figcaption><span>Checked before, recorded after. A ledger that cannot be read counts as full, never as empty.</span><button class="btn" data-replay>REPLAY</button></figcaption>
+  </figure>
+
+<pre><code>uno spend                        # spent so far, against the cap
+export UNO_SPEND_CAP_USD=50      # raise the total cap
+uno -p "..." --max-cost 0.50     # stop this run before it spends more than 50 cents
+/cost                            # in the chat: this chat and the total</code></pre>
+  <ul>
+    <li>Helper agents spend from the same meter, and each gets at most a quarter of what is left.</li>
+    <li>Web searches are counted too, at about a cent each (1.4 to 3.5 cents on Gemini).</li>
+    <li>A model missing from Uno's price table is charged at a deliberately high rate, so the total can overstate what you really spent. Your provider's dashboard has the true figure.</li>
+  </ul>
+
+  <h2>Use cases</h2>
+  <div class="uses">
+    <div class="use"><h4>A nightly job with a ceiling</h4><p>Whatever happens overnight, it cannot cost more than this.</p><code class="run">uno -p "update deps and fix breakages" --max-cost 1</code></div>
+    <div class="use"><h4>Trying a new model</h4><p>Find out what a task really costs before you make it routine.</p><code class="run">uno -p "..." --model gpt-6-sol --output json</code></div>
+  </div>
+
+  <div class="why"><b>DESIGN DECISION · D20</b><p>A hard cap that fails closed. Agents loop, and a loop on a big model can cost real money in minutes. The ledger is append-only in whole micro-dollars so totals never drift, and an unreadable line is an error rather than a zero.</p></div>
+</section>
+
+<!-- ============================== WHAT UNO KNOWS ============================== -->
+
+<section class="page" data-page="instructions">
+  <p class="crumb">WHAT UNO KNOWS</p>
+  <h1>Instruction files</h1>
+  <p class="lede">An <code>AGENTS.md</code> file tells Uno how your project works: how to build it, how to test it, what to avoid. Uno reads it at the start of every session.</p>
+  <div class="tldr"><b>IN ONE LINE</b><span>Write the things you would tell a new teammate on day one. Commit it. Every agent that reads <code>AGENTS.md</code> benefits.</span></div>
+
+  <figure class="fig">
+    <svg viewBox="0 0 760 200" role="img" aria-label="Uno collects AGENTS.md from your config folder, the repository root and each folder down to where you are, and puts them in the first message.">
+      <g class="s-s">
+        <rect class="s-box" x="20" y="20" width="230" height="34" rx="8"/><text x="34" y="42">~/.config/uno/AGENTS.md  (yours)</text>
+        <rect class="s-box" x="40" y="66" width="210" height="34" rx="8"/><text x="54" y="88">repo/AGENTS.md</text>
+        <rect class="s-box" x="60" y="112" width="190" height="34" rx="8"/><text x="74" y="134">repo/api/AGENTS.md</text>
+        <rect class="s-box" x="80" y="158" width="170" height="34" rx="8"/><text x="94" y="180">repo/api/v2/  ← you are here</text>
+      </g>
+      <path id="in1" class="s-dash" d="M250,37 C360,37 380,100 470,100"/>
+      <path id="in2" class="s-dash" d="M250,83 C360,83 380,100 470,100"/>
+      <path id="in3" class="s-dash" d="M250,129 C360,129 380,100 470,100"/>
+      <circle r="5" class="s-dot"><animateMotion dur="3s" repeatCount="indefinite"><mpath href="#in1"/></animateMotion></circle>
+      <circle r="5" class="s-dot" opacity="0"><animateMotion dur="3s" begin="0.5s" repeatCount="indefinite"><mpath href="#in2"/></animateMotion><set attributeName="opacity" to="1" begin="0.5s"/></circle>
+      <circle r="5" class="s-dot" opacity="0"><animateMotion dur="3s" begin="1s" repeatCount="indefinite"><mpath href="#in3"/></animateMotion><set attributeName="opacity" to="1" begin="1s"/></circle>
+      <rect class="s-box hot" x="470" y="40" width="270" height="120" rx="12"/>
+      <text class="s-t" x="486" y="66">FIRST USER MESSAGE</text>
+      <g class="s-s"><text x="486" y="92">environment: folder, branch, date</text><text x="486" y="112">instructions, general to specific</text><text x="486" y="132">memory · skills list</text><text x="486" y="150" style="fill:var(--accent)">then your prompt</text></g>
+    </svg>
+    <figcaption><span>General first, specific last, so the closest file has the final word.</span><button class="btn" data-replay>REPLAY</button></figcaption>
+  </figure>
+
+  <h2>The rules</h2>
+  <ul>
+    <li>In each folder, <code>AGENTS.md</code> is read; <code>CLAUDE.md</code> is read only where there is no <code>AGENTS.md</code>. Existing Claude Code projects work on day one.</li>
+    <li>Uno looks in your config folder, then each folder from the repository root down to where you started it.</li>
+    <li>Instruction files load without <code>uno trust</code>: they are text, and everything they lead to is still checked.</li>
+  </ul>
+
+  <h2>A good AGENTS.md</h2>
+<pre><code># my-app
+
+## Build and test
+- `pnpm i` once; `pnpm test` for unit tests; `pnpm test:e2e` needs Docker.
+- Lint with `pnpm lint --fix` before you say you are done.
+
+## Conventions
+- TypeScript strict. No default exports.
+- API handlers live in src/api/&lt;resource&gt;.ts, one file per resource.
+- Dates are always UTC ISO strings; use src/lib/time.ts, never `new Date()` directly.
+
+## Don't
+- Don't touch src/generated/: it is rebuilt by `pnpm codegen`.
+- Don't add dependencies without asking.</code></pre>
+  <p>Short and specific beats long and general. "Run <code>pnpm test</code>" is worth more than "write good tests".</p>
+
+  <h2>Use cases</h2>
+  <div class="uses">
+    <div class="use"><h4>Stop repeating yourself</h4><p>If you have told Uno the same thing twice, it belongs in AGENTS.md.</p><code class="run">uno -p "write an AGENTS.md for this repo from what you can see"</code></div>
+    <div class="use"><h4>Personal habits everywhere</h4><p>Your own preferences, in every project, in your config folder.</p><code class="run">~/.config/uno/AGENTS.md</code></div>
+  </div>
+
+  <div class="why"><b>DESIGN DECISION · D10, M14, M15</b><p><code>AGENTS.md</code> is the name every major harness reads, so it is primary. The instructions go in the first user message rather than the system prompt: the system prompt then never varies between projects, which keeps it cached everywhere.</p></div>
+</section>
+
+<section class="page" data-page="memory">
+  <p class="crumb">WHAT UNO KNOWS</p>
+  <h1>Long-term memory</h1>
+  <p class="lede">Uno keeps its own notes between sessions: what it learned about you and about each project. You can read and edit them like any other file.</p>
+  <div class="tldr"><b>IN ONE LINE</b><span><code>AGENTS.md</code> is what you tell Uno; memory is what Uno noticed. Both are plain Markdown.</span></div>
+
+  <figure class="fig">
+    <svg viewBox="0 0 760 200" role="img" aria-label="Three sessions on a timeline. Each starts by reading memory, and may write a note during the work, which the next session reads.">
+      <line class="s-line" x1="20" y1="150" x2="740" y2="150"/>
+      <g>
+        <rect class="s-box" x="40" y="120" width="180" height="60" rx="10"/><text class="s-t" x="130" y="146" text-anchor="middle">MONDAY</text><text class="s-s" x="130" y="166" text-anchor="middle">"tests need Docker"</text>
+        <rect class="s-box" x="290" y="120" width="180" height="60" rx="10"/><text class="s-t" x="380" y="146" text-anchor="middle">TUESDAY</text><text class="s-s" x="380" y="166" text-anchor="middle">"prefers small PRs"</text>
+        <rect class="s-box" x="540" y="120" width="180" height="60" rx="10"/><text class="s-t" x="630" y="146" text-anchor="middle">FRIDAY</text><text class="s-s" x="630" y="166" text-anchor="middle">starts knowing both</text>
+      </g>
+      <rect class="s-box hot" x="250" y="20" width="260" height="56" rx="10"/>
+      <text class="s-t" x="380" y="44" text-anchor="middle">MEMORY.md</text>
+      <text class="s-s" x="380" y="64" text-anchor="middle">global + one per project</text>
+      <path id="m1" class="s-dash" d="M130,120 C130,70 200,48 250,48"/>
+      <path id="m2" class="s-dash" d="M380,120 L380,76"/>
+      <path id="m3" class="s-dash" d="M510,48 C580,48 630,70 630,120"/>
+      <circle r="5" class="s-dot"><animateMotion dur="6s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.25;1" calcMode="linear"><mpath href="#m1"/></animateMotion></circle>
+      <circle r="5" class="s-dot" opacity="0"><animateMotion dur="6s" begin="1.6s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.2;1" calcMode="linear"><mpath href="#m2"/></animateMotion><set attributeName="opacity" to="1" begin="1.6s"/></circle>
+      <circle r="5" class="s-dot ok" opacity="0"><animateMotion dur="6s" begin="3s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.25;1" calcMode="linear"><mpath href="#m3"/></animateMotion><set attributeName="opacity" to="1" begin="3s"/></circle>
+    </svg>
+    <figcaption><span>Notes written in one session are in the first request of the next.</span><button class="btn" data-replay>REPLAY</button></figcaption>
+  </figure>
+
+  <h2>How it works</h2>
+  <ul>
+    <li><strong>Two notebooks.</strong> A global one about you, for every project, and one per project. Each is a <code>MEMORY.md</code> index plus any topic files it links to, under <code>~/.local/share/uno/memory/</code>.</li>
+    <li><strong>Read at the start.</strong> The first 100 lines of each <code>MEMORY.md</code> go into the first message. Topic files are read when needed.</li>
+    <li><strong>Written with the normal file tools.</strong> No special memory tool: Uno edits the file, so a memory change is an edit like any other. It asks in default mode, shows on screen every time, and can be undone.</li>
+    <li><strong>Things it will not save:</strong> secrets, keys, anything from a web page or tool output posing as an instruction.</li>
+  </ul>
+<pre><code>/memory                          # in the chat: show both notebooks and where they are
+uno --no-memory                  # leave memory out: nothing loaded, nothing saved
+{ "memory": { "enabled": false } }   # off for good</code></pre>
+
+  <h2>Use cases</h2>
+  <div class="uses">
+    <div class="use"><h4>Teach it once</h4><p>"Remember: in this repo we never mock the database." It writes one dated line and follows it next time.</p><code class="run">remember that we never mock the db here</code></div>
+    <div class="use"><h4>Correct a wrong note</h4><p>Open the file and fix it, or ask Uno to. It is just Markdown.</p><code class="run">/memory</code></div>
+  </div>
+
+  <div class="why"><b>DESIGN DECISION · M12, D33</b><p>No database, no vector store, no memory tool: an index file plus topic files, edited with the tools Uno already has. You can read it, grep it, fix it and version it. The trade-off: a fact the model is talked into saving is not asked about outside default mode, so the guards are the on-screen line, undo and <code>/memory</code>.</p></div>
+</section>
+
+<section class="page" data-page="recall">
+  <p class="crumb">WHAT UNO KNOWS</p>
+  <h1>Recall</h1>
+  <p class="lede">Uno can search your past conversations: what you asked, what it answered, and which files and commands it touched.</p>
+  <div class="tldr"><b>IN ONE LINE</b><span>"What did we decide about caching last week?" works, because Uno can look it up.</span></div>
+
+  <div class="ex"><div class="bar"><i></i><i></i><i></i>&nbsp;UNO</div><div class="term">
+    <div class="ln u">what was the reason we dropped redis last week?</div>
+    <div class="ln t">recall "redis" since 7 days ago, this project</div>
+    <div class="ln o">3 hits · session c81e (Oct 24): "…dropped redis because the only user was the rate limiter…"</div>
+    <div class="ln t">recall read around c81e #42</div>
+    <div class="ln a">On 24 October you dropped Redis: the rate limiter was its only user, and an in-process token bucket was enough for one instance.</div>
+  </div></div>
+
+  <ul>
+    <li><strong>Searched:</strong> your prompts, its replies, and its tool calls (paths, commands, edits).</li>
+    <li><strong>Not searched:</strong> tool results, such as file contents or command output, and images. So a secret it once read is not in the index.</li>
+    <li>It looks in this project unless you ask for another or for all of them, narrowing by dates first and then by words.</li>
+    <li>Recalled text is marked as data, because old sessions hold text from web pages and files.</li>
+  </ul>
+
+  <div class="why"><b>DESIGN DECISION · M16</b><p>Sessions stay as JSONL files, the source of truth; recall reads them on demand rather than keeping a separate database in sync. Memory holds the few facts worth keeping; recall finds everything else when you ask.</p></div>
+</section>
+
+<section class="page" data-page="skills">
+  <p class="crumb">WHAT UNO KNOWS</p>
+  <h1>Skills</h1>
+  <p class="lede">A skill is a folder of instructions for one kind of job, such as "how we release" or "how to drive a browser". Uno sees only each skill's name and one-line description, and reads the rest when a task needs it.</p>
+  <div class="tldr"><b>IN ONE LINE</b><span>A <code>SKILL.md</code> with a name and description up top. Costs about 100 tokens until used.</span></div>
+
+  <figure class="fig">
+    <svg viewBox="0 0 760 170" role="img" aria-label="Many skills sit on disk. Only their names and descriptions are in the prompt. When a task matches, Uno reads that one skill's file.">
+      <g class="s-s">
+        <rect class="s-box" x="20" y="20" width="150" height="30" rx="6"/><text x="32" y="40">release/</text>
+        <rect class="s-box" x="20" y="58" width="150" height="30" rx="6"/><text x="32" y="78">browser/</text>
+        <rect class="s-box hot" x="20" y="96" width="150" height="30" rx="6"/><text x="32" y="116">db-migration/</text>
+        <rect class="s-box" x="20" y="134" width="150" height="30" rx="6"/><text x="32" y="154">changelog/</text>
+      </g>
+      <rect class="s-box" x="270" y="34" width="220" height="100" rx="10"/>
+      <text class="s-t" x="286" y="58">IN THE PROMPT</text>
+      <g class="s-s"><text x="286" y="80">4 × name + description</text><text x="286" y="100">≈ 400 tokens</text><text x="286" y="120">bodies stay on disk</text></g>
+      <path id="sk1" class="s-dash" d="M170,111 C220,111 220,84 270,84"/>
+      <path id="sk2" class="s-dash" d="M490,84 L590,84"/>
+      <circle r="5" class="s-dot"><animateMotion dur="4s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.4;1" calcMode="linear"><mpath href="#sk1"/></animateMotion></circle>
+      <circle r="5" class="s-dot" opacity="0"><animateMotion dur="4s" begin="1.6s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.4;1" calcMode="linear"><mpath href="#sk2"/></animateMotion><set attributeName="opacity" to="1" begin="1.6s"/></circle>
+      <rect class="s-box ok" x="590" y="50" width="150" height="70" rx="10"/>
+      <text class="s-t" x="665" y="80" text-anchor="middle">read SKILL.md</text>
+      <text class="s-s" x="665" y="100" text-anchor="middle">only when needed</text>
+    </svg>
+    <figcaption><span>"Add a migration for the orders table" matches db-migration, so Uno reads that one file.</span><button class="btn" data-replay>REPLAY</button></figcaption>
+  </figure>
+
+<pre><code>.agents/skills/db-migration/SKILL.md
+---
+name: db-migration
+description: Create and apply a database migration. Use when changing the schema.
+---
+1. Run `pnpm db:new &lt;name&gt;` to create the file in db/migrations/.
+2. Write both up and down. Never edit a migration that has shipped.
+3. Run `pnpm db:migrate &amp;&amp; pnpm test:db`.</code></pre>
+  <ul>
+    <li>Found in <code>.agents/skills</code> or <code>.claude/skills</code>, in the project or your home folder. A project skill replaces a home one with the same name.</li>
+    <li><code>~/.claude/skills</code> is left out unless <code>"skills": {"claude_home": true}</code>: it usually holds skills written for Claude Code's own tools.</li>
+    <li><code>when_to_use</code> is added to the description; <code>disable-model-invocation: true</code> hides a skill. <code>/skills</code> lists them.</li>
+  </ul>
+
+  <h2>Use cases</h2>
+  <div class="uses">
+    <div class="use"><h4>Your release checklist</h4><p>Ten steps you always forget one of. Now Uno follows them, every time.</p><code class="run">uno -p "cut a release for 2.4.0"</code></div>
+    <div class="use"><h4>Share across agents</h4><p>The same <code>.agents/skills</code> folder works in other harnesses that support Agent Skills.</p><code class="run">ls .agents/skills</code></div>
+  </div>
+
+  <div class="why"><b>DESIGN DECISION · M4, M13</b><p>Skills need no new tool: activating one is a plain file read. That keeps the tool list fixed (good for the cache) and puts the cost of a skill near zero until it is used. It is also why the browser is a skill: its long instructions load only when a task needs a browser.</p></div>
+</section>
+
+<!-- ============================== EXTEND ============================== -->
+
+<section class="page" data-page="extend">
+  <p class="crumb">EXTEND</p>
+  <h1>Which one do I use?</h1>
+  <p class="lede">Five ways to shape what Uno does. They solve different problems; this page helps you pick the smallest one that works.</p>
+  <div class="tldr"><b>IN ONE LINE</b><span>Facts go in AGENTS.md, procedures in skills, guarantees in hooks or rules, outside systems in MCP.</span></div>
+
+  <table>
+    <thead><tr><th>I want Uno to…</th><th>Use</th><th>Because</th></tr></thead>
+    <tbody>
+      <tr><td>know how my project builds and tests</td><td><a href="#/instructions">AGENTS.md</a></td><td>Read every session, shared with the team</td></tr>
+      <tr><td>remember what it learned about me</td><td><a href="#/memory">Memory</a></td><td>Uno writes it; you can edit it</td></tr>
+      <tr><td>follow a multi-step procedure sometimes</td><td><a href="#/skills">A skill</a></td><td>Costs nothing until used</td></tr>
+      <tr><td>never run a certain command</td><td><a href="#/permissions">A deny rule</a></td><td>Holds in every mode</td></tr>
+      <tr><td>always run the formatter after an edit</td><td><a href="#/hooks">A hook</a></td><td>Runs every time, not when the model remembers</td></tr>
+      <tr><td>check a policy before a command runs</td><td><a href="#/hooks">A PreToolUse hook</a></td><td>Your code decides, and can block</td></tr>
+      <tr><td>use GitHub, Linear, a database, a design tool</td><td><a href="#/mcp">An MCP server</a></td><td>Real tools with real sign-in</td></tr>
+      <tr><td>dig through a lot without filling the chat</td><td><a href="#/helpers">A helper agent</a></td><td>Only the summary comes back</td></tr>
+      <tr><td>read a page that needs JavaScript or a login</td><td><a href="#/web">The browser</a></td><td>A real browser, driven by a skill</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Rule of thumb</h2>
+  <figure class="fig">
+    <svg viewBox="0 0 760 120" role="img" aria-label="A scale from advice to guarantee: AGENTS.md, skill, rule, hook.">
+      <line class="s-line" x1="40" y1="60" x2="720" y2="60"/>
+      <path class="s-flow" d="M40,60 L720,60"/>
+      <g class="s-s" text-anchor="middle">
+        <circle cx="80" cy="60" r="8" class="s-dot w"/><text x="80" y="96">AGENTS.md</text>
+        <circle cx="280" cy="60" r="8" class="s-dot w"/><text x="280" y="96">skill</text>
+        <circle cx="480" cy="60" r="8" class="s-dot"/><text x="480" y="96">rule</text>
+        <circle cx="680" cy="60" r="8" class="s-dot"/><text x="680" y="96">hook</text>
+        <text x="80" y="30">the model is asked</text><text x="680" y="30">it always happens</text>
+      </g>
+    </svg>
+    <figcaption><span>Instructions and skills are advice the model usually follows. Rules and hooks are enforced by Uno, whatever the model thinks.</span></figcaption>
+  </figure>
+</section>
+
+<section class="page" data-page="mcp">
+  <p class="crumb">EXTEND</p>
+  <h1>MCP servers</h1>
+  <p class="lede">MCP is the standard way to plug outside tools into an agent: GitHub, Linear, Notion, a database. Uno connects to as many servers as you like, and the model sees just two tools in front of all of them.</p>
+  <div class="tldr"><b>IN ONE LINE</b><span>Declare servers in Claude Code's format; the model uses <code>mcp_search</code> to find a tool and <code>mcp_call</code> to call it.</span></div>
+
+  <figure class="fig">
+    <svg viewBox="0 0 760 240" role="img" aria-label="Five MCP servers with dozens of tools sit behind two small tools, mcp_search and mcp_call. The prompt cost stays about 250 tokens however many servers you add.">
+      <g class="s-s">
+        <rect class="s-box" x="20" y="16" width="150" height="34" rx="8"/><text x="34" y="38">github · 41 tools</text>
+        <rect class="s-box" x="20" y="60" width="150" height="34" rx="8"/><text x="34" y="82">linear · 23 tools</text>
+        <rect class="s-box" x="20" y="104" width="150" height="34" rx="8"/><text x="34" y="126">notion · 15 tools</text>
+        <rect class="s-box" x="20" y="148" width="150" height="34" rx="8"/><text x="34" y="170">postgres · 6 tools</text>
+        <rect class="s-box" x="20" y="192" width="150" height="34" rx="8"/><text x="34" y="214">figma · 12 tools</text>
+      </g>
+      <path class="s-line" d="M170,33 C240,33 250,100 300,100"/><path class="s-line" d="M170,77 C240,77 250,100 300,100"/><path class="s-line" d="M170,121 C240,121 250,120 300,120"/><path class="s-line" d="M170,165 C240,165 250,140 300,140"/><path class="s-line" d="M170,209 C240,209 250,140 300,140"/>
+      <rect class="s-box hot" x="300" y="84" width="130" height="34" rx="8"/><text class="s-t" x="365" y="106" text-anchor="middle">mcp_search</text>
+      <rect class="s-box hot" x="300" y="126" width="130" height="34" rx="8"/><text class="s-t" x="365" y="148" text-anchor="middle">mcp_call</text>
+      <path id="mc1" class="s-dash" d="M560,110 L430,101"/>
+      <path id="mc2" class="s-dash" d="M430,143 C470,150 520,150 560,130"/>
+      <path id="mc3" class="s-dash" d="M300,143 C250,160 220,30 170,33"/>
+      <circle r="5" class="s-dot w"><animateMotion dur="5s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.2;1" calcMode="linear"><mpath href="#mc1"/></animateMotion></circle>
+      <circle r="5" class="s-dot" opacity="0"><animateMotion dur="5s" begin="1.2s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.01;0.3;1" calcMode="linear"><mpath href="#mc3"/></animateMotion><set attributeName="opacity" to="1" begin="1.2s"/></circle>
+      <rect class="s-box" x="560" y="70" width="180" height="96" rx="10"/>
+      <text class="s-t" x="650" y="96" text-anchor="middle">MODEL</text>
+      <text class="s-s" x="650" y="118" text-anchor="middle">sees 2 tools</text>
+      <text class="s-s" x="650" y="136" text-anchor="middle">≈ 250 tokens</text>
+      <text class="s-s" x="560" y="200">97 tools would be ~15k tokens</text>
+      <text class="s-s" x="560" y="218">in every request, and break the cache</text>
+    </svg>
+    <figcaption><span>The model searches for the tool it needs, gets its schema, then calls it. Tool counts are illustrative.</span><button class="btn" data-replay>REPLAY</button></figcaption>
+  </figure>
+
+  <h2>Add a server</h2>
+<pre><code>// ~/.config/uno/settings.json, or the project's .mcp.json or .uno/settings.json
+{
+  "mcpServers": {
+    "files":  { "command": "npx", "args": ["-y", "@modelcontextprotocol/server-filesystem", "."] },
+    "github": { "type": "http", "url": "https://api.githubcopilot.com/mcp/" },
+    "db":     { "command": "my-db-mcp", "env": { "DATABASE_URL": "${DATABASE_URL}" } }
+  }
+}</code></pre>
+<pre><code>uno mcp login github      # once, for servers that sign in through the browser
+uno mcp status            # each server's state, without connecting
+/mcp                      # in the chat: transport, state, sign-in, last errors
+/reload                   # pick up new servers without a new session</code></pre>
+
+  <h2>What to know</h2>
+  <ul>
+    <li><strong>Nothing starts until used.</strong> The first MCP call of a session starts every server; one that fails is named with its reason.</li>
+    <li><strong>Each call asks.</strong> Answer <kbd>a</kbd> for this tool, <kbd>s</kbd> for the server, <kbd>m</kbd> for every MCP tool, or write rules: <code>mcp__github__create_issue</code>, <code>mcp__github</code>, <code>mcp</code>.</li>
+    <li><strong>A browser never opens by itself.</strong> A server that needs sign-in mid-run is reported: <code>needs sign-in: run uno mcp login &lt;name&gt;</code>.</li>
+    <li><strong>Secrets stay out of sight.</strong> Tokens live in <code>~/.config/uno/mcp-tokens.json</code>, readable by you only, and never reach the model or the session file.</li>
+    <li><strong>Trust.</strong> A project's servers load only after <code>uno trust</code>. Servers run outside the sandbox.</li>
+  </ul>
+
+  <h2>Use cases</h2>
+  <div class="uses">
+    <div class="use"><h4>Ticket to pull request</h4><p>Read the Linear issue, make the change, open the PR on GitHub.</p><code class="run">uno -p "do ENG-412 and open a PR"</code></div>
+    <div class="use"><h4>Ask your database</h4><p>A read-only Postgres server: "which customers signed up but never ordered?"</p><code class="run">uno --allow mcp__db__query</code></div>
+  </div>
+
+  <div class="why"><b>DESIGN DECISION · L3, M7</b><p>Two fixed tools, whatever the number of servers. Loading every server's tools into the prompt costs thousands of tokens on every request, and adding or removing a server would change the tool list and break the cache. Search-then-call costs one extra step the first time and saves on every request after.</p></div>
+</section>
+
+<section class="page" data-page="hooks">
+  <p class="crumb">EXTEND</p>
+  <h1>Hooks</h1>
+  <p class="lede">Hooks are your own commands, run by Uno at fixed points in a turn. They are how you make something happen every time, rather than when the model remembers.</p>
+  <div class="tldr"><b>IN ONE LINE</b><span>Claude Code's hook contract: JSON on stdin, exit code 2 blocks. Five events. Hooks can only make things stricter.</span></div>
+
+  <figure class="fig">
+    <svg viewBox="0 0 760 190" role="img" aria-label="A turn runs along a timeline with five hook points: session start, prompt submit, before a tool, after a tool, and stop. A command is blocked at the before-tool hook.">
+      <line class="s-line" x1="30" y1="80" x2="730" y2="80"/>
+      <path id="hk" d="M30,80 L730,80"/>
+      <g class="s-s" text-anchor="middle">
+        <circle cx="80" cy="80" r="9" class="s-box"/><text x="80" y="116">SessionStart</text><text x="80" y="132">once per run</text>
+        <circle cx="220" cy="80" r="9" class="s-box"/><text x="220" y="116">UserPromptSubmit</text><text x="220" y="132">can drop the prompt</text>
+        <circle cx="380" cy="80" r="9" class="s-box hot"/><text x="380" y="116">PreToolUse</text><text x="380" y="132">can block the call</text>
+        <circle cx="530" cy="80" r="9" class="s-box"/><text x="530" y="116">PostToolUse</text><text x="530" y="132">can flag the result</text>
+        <circle cx="680" cy="80" r="9" class="s-box"/><text x="680" y="116">Stop</text><text x="680" y="132">can say "keep going"</text>
+      </g>
+      <circle r="6" class="s-dot w"><animateMotion dur="6s" repeatCount="indefinite" keyPoints="0;0.5;0.5;1;1" keyTimes="0;0.35;0.55;0.9;1" calcMode="linear"><mpath href="#hk"/></animateMotion></circle>
+      <g opacity="0"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;0.35;0.4;0.55;1" dur="6s" repeatCount="indefinite"/>
+        <rect x="300" y="18" width="160" height="34" rx="8" fill="var(--page)" stroke="var(--accent)"/><text class="s-s" x="380" y="40" text-anchor="middle" style="fill:var(--accent)">no-rm.sh → exit 2</text></g>
+    </svg>
+    <figcaption><span>The turn pauses at each hook. A blocking hook's reason goes to the model, which tries something else.</span><button class="btn" data-replay>REPLAY</button></figcaption>
+  </figure>
+
+<pre><code>{
+  "hooks": {
+    "PreToolUse":  [{ "matcher": "Bash", "hooks": [{ "type": "command", "command": "~/bin/no-rm.sh", "timeout": 10 }] }],
+    "PostToolUse": [{ "matcher": "Edit|Write", "hooks": [{ "type": "command", "command": "npx prettier --write \"$(jq -r .tool_input.path)\"" }] }]
+  }
+}</code></pre>
+<pre><code>#!/bin/sh
+# ~/bin/no-rm.sh: refuse any shell command that contains rm -rf
+if jq -r .tool_input.command | grep -q 'rm -rf'; then
+  echo "rm -rf is not allowed here; delete files one by one" &gt;&amp;2
+  exit 2
+fi</code></pre>
+
+  <table>
+    <thead><tr><th>Event</th><th>When</th><th>Exit 2, or <code>"decision": "block"</code></th></tr></thead>
+    <tbody>
+      <tr><td><code>PreToolUse</code></td><td>before a tool runs</td><td>the call is not run; the reason reaches the model</td></tr>
+      <tr><td><code>PostToolUse</code></td><td>after it ran</td><td>the result is marked as an error, with the reason</td></tr>
+      <tr><td><code>UserPromptSubmit</code></td><td>when you send a prompt</td><td>the prompt is not sent; you see why</td></tr>
+      <tr><td><code>Stop</code></td><td>when the model is about to finish</td><td>it carries on with the reason, at most three times</td></tr>
+      <tr><td><code>SessionStart</code></td><td>once per run</td><td>nothing to block; output is added as context</td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li>Hooks live in <code>~/.config/uno/settings.json</code>, <code>.uno/settings.json</code> or <code>.claude/settings.json</code>; project ones only after <code>uno trust</code>.</li>
+    <li>Matchers use Claude Code's tool names: <code>Bash</code> is <code>bash</code>, <code>Edit</code> covers <code>edit</code> and <code>apply_patch</code>. Uno's edit input is <code>path</code> and <code>edits</code>, not <code>file_path</code>.</li>
+    <li>A <code>PreToolUse</code> hook that times out or cannot start <strong>blocks</strong> the call. Default timeout 30 s.</li>
+    <li>Hooks run outside the sandbox, in the project folder, without your API keys.</li>
+  </ul>
+
+  <h2>Use cases</h2>
+  <div class="uses">
+    <div class="use"><h4>Format on every edit</h4><p>PostToolUse on <code>Edit|Write</code> runs your formatter. No more "please run prettier".</p><code class="run">"matcher": "Edit|Write"</code></div>
+    <div class="use"><h4>Don't stop with red tests</h4><p>A Stop hook runs the tests and blocks with the failures, so Uno keeps going.</p><code class="run">"Stop": [{ … "command": "./check.sh" }]</code></div>
+    <div class="use"><h4>Company policy</h4><p>PreToolUse checks every command against your list, in your language.</p><code class="run">"matcher": "Bash"</code></div>
+    <div class="use"><h4>Fresh context at start</h4><p>SessionStart prints today's on-call notes or open incidents into the conversation.</p><code class="run">"SessionStart": [ … ]</code></div>
+  </div>
+
+  <div class="why"><b>DESIGN DECISION · D10</b><p>Claude Code's contract, so existing hooks work unchanged. Unlike Claude Code, a slow or broken <code>PreToolUse</code> hook blocks rather than lets the call through: a policy check that does not answer is no policy. And a hook can only tighten: <code>allow</code> from a hook changes nothing.</p></div>
+</section>
+
+<section class="page" data-page="helpers">
+  <p class="crumb">EXTEND</p>
+  <h1>Helper agents</h1>
+  <p class="lede">Uno can hand a side job to a helper: a fresh copy of itself with an empty memory, which does the work and sends back a short report. The long searching and log-reading never enters your main conversation.</p>
+  <div class="tldr"><b>IN ONE LINE</b><span>The <code>task</code> tool. Explore helpers read in parallel on a cheaper model; general helpers can edit, one at a time.</span></div>
+
+  <figure class="fig">
+    <svg viewBox="0 0 760 240" role="img" aria-label="The main agent sends three explore helpers off in parallel. Each does many tool calls, then returns a short report. Only the reports enter the main conversation.">
+      <rect class="s-box hot" x="20" y="90" width="150" height="60" rx="10"/>
+      <text class="s-t" x="95" y="116" text-anchor="middle">UNO</text><text class="s-s" x="95" y="136" text-anchor="middle">main conversation</text>
+      <path id="hp1" class="s-dash" d="M170,110 C240,110 250,40 320,40"/>
+      <path id="hp2" class="s-dash" d="M170,120 L320,120"/>
+      <path id="hp3" class="s-dash" d="M170,130 C240,130 250,200 320,200"/>
+      <g>
+        <rect class="s-box" x="320" y="18" width="180" height="44" rx="8"/><text class="s-s" x="334" y="44">explore · auth flow</text>
+        <rect class="s-box" x="320" y="98" width="180" height="44" rx="8"/><text class="s-s" x="334" y="124">explore · payment code</text>
+        <rect class="s-box" x="320" y="178" width="180" height="44" rx="8"/><text class="s-s" x="334" y="204">explore · test setup</text>
+      </g>
+      <g fill="var(--ghost)">
+        <rect x="510" y="30" width="6" height="20"><animate attributeName="width" values="0;180;180" keyTimes="0;0.6;1" dur="5s" repeatCount="indefinite"/></rect>
+        <rect x="510" y="110" width="6" height="20"><animate attributeName="width" values="0;140;140" keyTimes="0;0.5;1" dur="5s" repeatCount="indefinite"/></rect>
+        <rect x="510" y="190" width="6" height="20"><animate attributeName="width" values="0;210;210" keyTimes="0;0.7;1" dur="5s" repeatCount="indefinite"/></rect>
+      </g>
+      <text class="s-s" x="560" y="80">40k tokens of reading…</text>
+      <path id="hpr" class="s-dash" d="M320,150 C260,170 220,160 170,145"/>
+      <circle r="5" class="s-dot"><animateMotion dur="5s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.2;1" calcMode="linear"><mpath href="#hp1"/></animateMotion></circle>
+      <circle r="5" class="s-dot"><animateMotion dur="5s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.2;1" calcMode="linear"><mpath href="#hp2"/></animateMotion></circle>
+      <circle r="5" class="s-dot"><animateMotion dur="5s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.2;1" calcMode="linear"><mpath href="#hp3"/></animateMotion></circle>
+      <circle r="5" class="s-dot ok"><animateMotion dur="5s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.75;0.95;1" calcMode="linear"><mpath href="#hpr"/></animateMotion></circle>
+      <text class="s-s" x="24" y="176" style="fill:var(--ok)">↑ 2k of report back</text>
+    </svg>
+    <figcaption><span>Three helpers read in parallel. Only their reports, a few hundred words each, come back.</span><button class="btn" data-replay>REPLAY</button></figcaption>
+  </figure>
+
+  <table>
+    <thead><tr><th></th><th>explore</th><th>general</th></tr></thead>
+    <tbody>
+      <tr><td>Can</td><td>read, search, fetch pages, look back with <code>recall</code>, read-only shell in the sandbox</td><td>everything Uno can, except start helpers, use <code>recall</code> or change memory</td></tr>
+      <tr><td>Model</td><td>a cheaper one on Anthropic and OpenAI (Haiku, Luna); your session's model elsewhere</td><td>your session's model</td></tr>
+      <tr><td>At once</td><td>several, side by side</td><td>one at a time</td></tr>
+      <tr><td>Rules</td><td>project is read-only, enforced by the OS</td><td>same permissions, sandbox and hooks as Uno</td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li>Up to four helpers at once. Each stops after 50 model turns, 10 minutes, or a quarter of the spending cap left when it started.</li>
+    <li>Helpers cannot start helpers (depth 1).</li>
+    <li>A report always comes back, even on failure: a status (<code>done</code>, <code>failed</code>, <code>stopped</code>), why it stopped, turns, tokens and cost. The full transcript is saved to a file.</li>
+  </ul>
+
+  <h2>Use cases</h2>
+  <div class="uses">
+    <div class="use"><h4>Learn a big codebase</h4><p>"How does a request get from the router to the database?" Three helpers trace three layers at once.</p><code class="run">uno --mode plan</code></div>
+    <div class="use"><h4>Find the cause in a huge log</h4><p>A helper reads 5,000 lines of CI output; you get the three that matter.</p><code class="run">use a helper to find why ci.log failed</code></div>
+  </div>
+
+  <div class="why"><b>DESIGN DECISION · L12, L13</b><p>Flat helpers, summary only, depth one: what nearly every harness converged on, because nested agents are hard to bound and to debug. Always return a structured report, because a helper that times out and returns nothing leaves the main agent guessing.</p></div>
+</section>
+
+<section class="page" data-page="web">
+  <p class="crumb">EXTEND</p>
+  <h1>Web and browser</h1>
+  <p class="lede">Uno has three ways to the web, from cheapest to most capable: the provider's search, reading one page, and driving a real browser.</p>
+  <div class="tldr"><b>IN ONE LINE</b><span>Search to find, <code>web_fetch</code> to read, the browser for pages that need JavaScript, clicks or a sign-in.</span></div>
+
+  <table>
+    <thead><tr><th>Way</th><th>Good for</th><th>Asks?</th><th>Cost</th></tr></thead>
+    <tbody>
+      <tr><td>Provider search</td><td>"what's the latest version of X", finding docs</td><td>no</td><td>about a cent a search (more on Gemini)</td></tr>
+      <tr><td><code>web_fetch</code></td><td>reading one docs page or changelog</td><td>yes, unless a rule covers the site</td><td>tokens only</td></tr>
+      <tr><td>Browser</td><td>apps, dashboards, forms, your local dev server</td><td>first browse of a session</td><td>tokens only</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Reading pages safely</h2>
+  <ul>
+    <li><code>web_fetch</code> refuses private and local addresses (checked after every DNS lookup and redirect), URLs carrying credentials, and anything that is not text.</li>
+    <li>A redirect to another site is reported, not followed. Long pages are cut to their start and end; the full text is saved to a file.</li>
+    <li>Page text is marked to the model as data, not instructions.</li>
+  </ul>
+
+  <h2>The browser</h2>
+<pre><code>brew install agent-browser       # or: npm i -g agent-browser</code></pre>
+  <ul>
+    <li>Uno drives it through the shell, taught by a bundled skill that loads only when a task needs a browser.</li>
+    <li>It starts with a fresh profile and no logins. It uses your own profile only when you ask in a prompt, and asks every time.</li>
+  </ul>
+
+  <h2>Use cases</h2>
+  <div class="uses">
+    <div class="use"><h4>Upgrade with the changelog</h4><p>Search for the release notes, read them, then apply the breaking changes.</p><code class="run">uno -p "upgrade to react-router 8, following its migration guide"</code></div>
+    <div class="use"><h4>Check your own app</h4><p>Open the dev server, click through signup, report what broke.</p><code class="run">open localhost:3000 and try signing up</code></div>
+  </div>
+
+  <div class="why"><b>DESIGN DECISION · D11, D12, D32</b><p>Search is on by default, even though it adds about 1,700 cached tokens per request on Anthropic: the model should be able to look things up whenever it needs. The browser is first-class but loaded on demand, so it costs nothing until a task needs it.</p></div>
+</section>
+
+<section class="page" data-page="images">
+  <p class="crumb">EXTEND</p>
+  <h1>Images</h1>
+  <p class="lede">Show Uno a screenshot, a mockup or a diagram, and it can work from it.</p>
+  <div class="tldr"><b>IN ONE LINE</b><span>Drag a file in, type <code>@path</code>, or press <kbd>Ctrl-V</kbd>. With <code>-p</code>, use <code>--image</code>.</span></div>
+<pre><code>uno -p "make the settings page match this" --image mock.png
+uno -p "what's wrong in @shot.png?"</code></pre>
+  <ul>
+    <li>PNG, JPEG, GIF (first frame) and WebP. HEIC and PDF are named and refused.</li>
+    <li>Over 2,000 px on the long side is shrunk. Location data and other EXIF is removed before sending.</li>
+    <li>About 1,600 tokens an image on Haiku, up to about 4,800 on newer Claude models. Only the newest 20 are sent with each request.</li>
+    <li>The model can also <code>read</code> images in your project, such as screenshots from a test run.</li>
+  </ul>
+
+  <h2>Use cases</h2>
+  <div class="uses">
+    <div class="use"><h4>Mockup to component</h4><p>Paste the design; get the JSX and CSS.</p><code class="run">--image design.png</code></div>
+    <div class="use"><h4>"It looks broken"</h4><p>Paste a screenshot of the bug instead of describing it.</p><code class="run">Ctrl-V</code></div>
+  </div>
+</section>
+
+<!-- ============================== AUTOMATE ============================== -->
+
+<section class="page" data-page="headless">
+  <p class="crumb">AUTOMATE</p>
+  <h1>Headless runs</h1>
+  <p class="lede"><code>uno -p</code> runs one task with nobody watching: no screen, no questions. It prints the answer and exits with a code your script can check.</p>
+  <div class="tldr"><b>IN ONE LINE</b><span>Edits go ahead (and can be undone); anything else that would ask is refused; exit code 2 tells you something was refused.</span></div>
+
+  <figure class="fig">
+    <svg viewBox="0 0 760 150" role="img" aria-label="A prompt goes in, Uno works with no questions, and out comes the answer on stdout, a status line on stderr, and an exit code.">
+      <rect class="s-box" x="20" y="50" width="150" height="50" rx="10"/><text class="s-s" x="95" y="80" text-anchor="middle">prompt / stdin</text>
+      <path id="hl1" class="s-dash" d="M170,75 L290,75"/>
+      <rect class="s-box hot" x="290" y="40" width="180" height="70" rx="35"/><text class="s-t" x="380" y="72" text-anchor="middle">uno -p</text><text class="s-s" x="380" y="92" text-anchor="middle">no one to ask</text>
+      <path id="hl2" class="s-dash" d="M470,60 C520,30 560,28 600,28"/>
+      <path id="hl3" class="s-dash" d="M470,75 L600,75"/>
+      <path id="hl4" class="s-dash" d="M470,90 C520,120 560,122 600,122"/>
+      <g class="s-s"><rect class="s-box" x="600" y="12" width="140" height="32" rx="8"/><text x="612" y="33">stdout · answer</text>
+      <rect class="s-box" x="600" y="59" width="140" height="32" rx="8"/><text x="612" y="80">stderr · status</text>
+      <rect class="s-box ok" x="600" y="106" width="140" height="32" rx="8"/><text x="612" y="127">exit 0 · 2 · 3</text></g>
+      <circle r="5" class="s-dot"><animateMotion dur="4s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.25;1" calcMode="linear"><mpath href="#hl1"/></animateMotion></circle>
+      <circle r="5" class="s-dot w" opacity="0"><animateMotion dur="4s" begin="1.6s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.25;1" calcMode="linear"><mpath href="#hl2"/></animateMotion><set attributeName="opacity" to="1" begin="1.6s"/></circle>
+      <circle r="5" class="s-dot w" opacity="0"><animateMotion dur="4s" begin="1.8s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.25;1" calcMode="linear"><mpath href="#hl3"/></animateMotion><set attributeName="opacity" to="1" begin="1.8s"/></circle>
+      <circle r="5" class="s-dot ok" opacity="0"><animateMotion dur="4s" begin="2s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.25;1" calcMode="linear"><mpath href="#hl4"/></animateMotion><set attributeName="opacity" to="1" begin="2s"/></circle>
+    </svg>
+    <figcaption><span>Three outputs, each for a different reader: you, your logs, your script.</span><button class="btn" data-replay>REPLAY</button></figcaption>
+  </figure>
+
+  <h2>Basics</h2>
+<pre><code>uno -p "add a test for parse_date"                  # one task
+uno -p "review this diff for bugs: $(git diff)"     # the diff goes in the prompt
+uno -p "fix the lint errors" --allow "bash(npm run lint)"
+uno -p "summarise src/billing" --mode plan           # read-only
+uno -p "..." --output json | jq .result              # for scripts</code></pre>
+
+  <h2>What is allowed with nobody to ask</h2>
+  <table>
+    <thead><tr><th>What</th><th>Default</th><th>To change it</th></tr></thead>
+    <tbody>
+      <tr><td>Reading and searching</td><td>allowed</td><td>a <code>deny</code> rule</td></tr>
+      <tr><td>Changing files in the project</td><td>allowed, undoable</td><td><code>--mode default</code> or <code>--mode plan</code></td></tr>
+      <tr><td><code>.git/</code>, <code>.uno/</code>, <code>.claude/</code></td><td>refused</td><td><code>--mode bypass</code> (not advised)</td></tr>
+      <tr><td>Shell commands</td><td>run in the sandbox without asking</td><td><code>--allow "bash(…)"</code> to run one outside</td></tr>
+      <tr><td>Web pages, MCP calls</td><td>refused unless a rule allows</td><td><code>--allow web_fetch(docs.rs)</code></td></tr>
+      <tr><td><code>.env</code> and key files</td><td>refused</td><td>none</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Continue a headless session</h2>
+<pre><code>uno -p "plan the migration, write it to PLAN.md"
+uno --resume -p "now do step 1"
+uno --resume -p "now step 2"</code></pre>
+
+  <div class="why"><b>DESIGN DECISION · D26</b><p>A headless run starts in accept-edits. Asking before every edit with nobody there would make <code>-p</code> useless, and edits stay inside the project and can be undone. Everything else that would ask is refused rather than allowed, and the exit code says so, so a script never silently does less than you think.</p></div>
+</section>
+
+<section class="page" data-page="ci">
+  <p class="crumb">AUTOMATE</p>
+  <h1>CI and scripts</h1>
+  <p class="lede">Because <code>uno -p</code> never waits for input and always ends with a clear exit code, it drops into CI jobs, git hooks and cron.</p>
+  <div class="tldr"><b>IN ONE LINE</b><span>Install with the one-liner, pass the key as a secret, cap the cost, check the exit code.</span></div>
+
+  <h2>A CI job that fixes lint</h2>
+<pre><code># .github/workflows/uno-lint.yml
+name: uno lint fix
+on: workflow_dispatch
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get install -y bubblewrap
+      - run: curl -fsSL https://unocode.motiontic.com/install.sh | sh
+      - run: |
+          ~/.local/bin/uno -p "run the linter and fix every error it reports" \
+            --allow "bash(npm run lint)" --max-cost 0.50 --output json &gt; uno.json
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          UNO_SPEND_CAP_USD: "2"
+      - run: jq -r .result uno.json &gt;&gt; "$GITHUB_STEP_SUMMARY"
+      - run: git diff --stat</code></pre>
+  <p>Add a step that commits or opens a pull request if you want the fix kept. Uno does not push on its own.</p>
+  <div class="warn"><b>MIND THE ALLOW RULE</b><p><code>bash(npm run lint)</code> runs whatever <code>package.json</code> says <code>lint</code> is, outside the sandbox, and Uno can edit <code>package.json</code>. Prefer naming the tool itself, such as <code>bash(npx eslint)</code>, in a job that holds secrets.</p></div>
+
+  <h2>A pre-commit review</h2>
+<pre><code>#!/bin/sh
+# .git/hooks/pre-commit: ask Uno to look over the staged diff, read-only
+uno -p "list real bugs in this diff, or say LGTM: $(git diff --cached)" --mode plan --model claude-haiku-4-5</code></pre>
+  <p>A very large diff can be too long for one argument (128 KB on Linux). Pipe it instead, without <code>-p</code>: the piped text is the whole prompt.</p>
+<pre><code>{ echo "list real bugs in this diff, or say LGTM:"; git diff --cached; } | uno --mode plan</code></pre>
+
+  <h2>A nightly job with cron</h2>
+<pre><code># crontab -e
+0 3 * * * cd ~/code/my-app &amp;&amp; uno -p "update minor dependencies and make the tests pass" --max-cost 1 &gt;&gt; ~/uno-nightly.log 2&gt;&amp;1</code></pre>
+
+  <h2>Check the result in a script</h2>
+<pre><code>uno -p "make the tests pass" --output json &gt; out.json
+case $? in
+  0) echo "done: $(jq -r .cost_usd out.json) USD" ;;
+  2) echo "finished, but $(jq .refused out.json) calls were refused" ;;
+  3) echo "stopped early: $(jq -r .exit out.json)" ;;
+  *) echo "failed" ;;
+esac</code></pre>
+
+  <div class="note"><b>COMING</b><p><code>--output stream-json</code> (events as they happen) and <code>uno schedule</code> (writes the cron or launchd entry for you) are planned. Until then, cron plus <code>-p</code> does the job.</p></div>
+</section>
+
+<!-- ============================== GUIDES ============================== -->
+
+<section class="page" data-page="usecases">
+  <p class="crumb">GUIDES</p>
+  <h1>Use cases</h1>
+  <p class="lede">Fourteen real jobs, each with the exact prompt, what Uno does, and the settings that make it smooth. Filter by what you are doing.</p>
+
+  <div class="filters">
+    <button data-f="all" aria-pressed="true">ALL</button>
+    <button data-f="fix" aria-pressed="false">FIX</button>
+    <button data-f="learn" aria-pressed="false">UNDERSTAND</button>
+    <button data-f="build" aria-pressed="false">BUILD</button>
+    <button data-f="review" aria-pressed="false">REVIEW</button>
+    <button data-f="auto" aria-pressed="false">AUTOMATE</button>
+    <button data-f="team" aria-pressed="false">TEAM</button>
+  </div>
+
+  <article class="recipe" data-tags="fix">
+    <h3>01 · Fix a failing test</h3>
+    <p class="who"><b>WHEN</b> CI is red and you want it green without reading the whole stack trace yourself.</p>
+<pre><code>uno
+› the test "parses leap years" fails. find out why and fix the code, not the test</code></pre>
+    <ol><li>Uno runs that one test in the sandbox (no question), reads the failure and the code under test.</li><li>It proposes an edit; you press <kbd>y</kbd>.</li><li>It re-runs the test and the suite around it, and tells you what was wrong.</li></ol>
+    <p><strong>Tip:</strong> "fix the code, not the test" matters. Say what must not change.</p>
+  </article>
+
+  <article class="recipe" data-tags="learn">
+    <h3>02 · Understand a codebase you just joined</h3>
+    <p class="who"><b>WHEN</b> Day one on a new repo. You want a map, not a lecture.</p>
+<pre><code>uno --mode plan
+› explain how a request flows from the HTTP router to the database. name the files.
+  use helpers to look at different layers at once</code></pre>
+    <ol><li>Plan mode: nothing can change, so you can relax.</li><li>Uno sends explore helpers to trace routing, services and storage in parallel on the cheaper model.</li><li>You get one answer with file paths, and your main conversation stays short.</li></ol>
+  </article>
+
+  <article class="recipe" data-tags="build">
+    <h3>03 · Add a feature, plan first</h3>
+    <p class="who"><b>WHEN</b> The change touches several files and you want to agree on the approach first.</p>
+<pre><code>uno --mode plan
+› plan adding CSV export to the reports page. write the plan, don't change anything
+/mode accept-edits
+› go ahead with the plan</code></pre>
+    <ol><li>In plan mode Uno can only write its plan, <code>.uno/plan.md</code>. Read it, push back, change it.</li><li>Switch to accept-edits and it carries out the plan without asking per file.</li><li>Review with <code>git diff</code>; <code>/undo all</code> if you hate it.</li></ol>
+  </article>
+
+  <article class="recipe" data-tags="build">
+    <h3>04 · Rename across the project</h3>
+    <p class="who"><b>WHEN</b> A name is wrong everywhere and find-and-replace would hit the wrong things.</p>
+<pre><code>uno -p "rename the User.getProfile method to User.fetchProfile, including callers and tests. run the type checker after"</code></pre>
+    <ol><li>Uno greps for every use, tells real calls from look-alikes, and edits each file.</li><li>Edits go ahead in a headless run; the type checker runs in the sandbox.</li><li><code>uno undo --all</code> reverts the lot if needed.</li></ol>
+  </article>
+
+  <article class="recipe" data-tags="review">
+    <h3>05 · Review a diff before you commit</h3>
+    <p class="who"><b>WHEN</b> A second pair of eyes, in five seconds, for a few cents.</p>
+<pre><code>uno -p "find real bugs only: logic errors, missed edge cases, leaks. no style comments. The diff: $(git diff)" --mode plan</code></pre>
+    <p><strong>Tip:</strong> make it a <code>pre-commit</code> hook with a cheap model. See <a href="#/ci">CI and scripts</a>.</p>
+  </article>
+
+  <article class="recipe" data-tags="fix">
+    <h3>06 · Find the cause in a huge log</h3>
+    <p class="who"><b>WHEN</b> A 5,000-line CI log and one real error somewhere in it.</p>
+<pre><code>uno
+› ci.log is from the failing build. use a helper to find the first real error and the line of our code that caused it</code></pre>
+    <ol><li>A helper reads the whole log in its own window.</li><li>Only its short report comes back, so your chat stays cheap for the fix that follows.</li></ol>
+  </article>
+
+  <article class="recipe" data-tags="build">
+    <h3>07 · Upgrade a library with its migration guide</h3>
+    <p class="who"><b>WHEN</b> A major version bump with breaking changes.</p>
+<pre><code>uno --allow "web_fetch(*.github.com)" --allow "bash(npm install)"
+› upgrade zod from 3 to 4. read the official migration guide first, then fix every breakage until the tests pass</code></pre>
+    <ol><li>Search finds the guide; <code>web_fetch</code> reads it (allowed by your rule).</li><li><code>npm install</code> needs the network, so it runs outside the sandbox: your rule allows exactly that.</li><li>Uno fixes call sites and loops on the test suite.</li></ol>
+  </article>
+
+  <article class="recipe" data-tags="build">
+    <h3>08 · Build from a screenshot</h3>
+    <p class="who"><b>WHEN</b> You have a design, not a spec.</p>
+<pre><code>uno -p "build this card as a React component in src/components/PlanCard.tsx, matching our Tailwind setup" --image plan-card.png</code></pre>
+  </article>
+
+  <article class="recipe" data-tags="fix">
+    <h3>09 · Check your app in a real browser</h3>
+    <p class="who"><b>WHEN</b> "It works on my machine", but does the signup form actually submit?</p>
+<pre><code>npm run dev &amp;
+uno
+› open localhost:3000, sign up with a test email, and tell me every console error you see. then fix them</code></pre>
+    <p>Needs <code>agent-browser</code> installed. The first browsing command asks once for the session.</p>
+  </article>
+
+  <article class="recipe" data-tags="team">
+    <h3>10 · Ticket to pull request with MCP</h3>
+    <p class="who"><b>WHEN</b> Your work lives in Linear and GitHub.</p>
+<pre><code>uno mcp login linear
+uno mcp login github
+uno
+› do ENG-412. when the tests pass, open a draft PR that links the issue</code></pre>
+    <ol><li><code>mcp_search</code> finds the Linear tool and <code>mcp_call</code> reads the issue; that call asks once (press <kbd>s</kbd> to allow the server).</li><li>Uno does the work like any other task.</li><li>Opening the PR is another MCP call: you see it and approve it.</li></ol>
+  </article>
+
+  <article class="recipe" data-tags="team">
+    <h3>11 · Share one setup with your team</h3>
+    <p class="who"><b>WHEN</b> Everyone should get the same allowed commands, hooks and servers.</p>
+<pre><code>// .uno/settings.json, committed
+{
+  "permissions": { "allow": ["bash(pnpm test)", "bash(pnpm lint)"], "deny": ["bash(git push)"] },
+  "hooks": { "PostToolUse": [{ "matcher": "Edit|Write", "hooks": [{ "type": "command", "command": "pnpm prettier --write ." }] }] }
+}</code></pre>
+    <p>Each teammate runs <code>uno trust</code> once. If someone changes the file later, everyone is asked to trust again.</p>
+  </article>
+
+  <article class="recipe" data-tags="auto">
+    <h3>12 · Nightly dependency bumps</h3>
+    <p class="who"><b>WHEN</b> Small updates that nobody wants to do by hand.</p>
+<pre><code>0 3 * * * cd ~/code/app &amp;&amp; uno -p "update patch and minor deps, keep tests green, write a summary to UPDATES.md" --allow "bash(npm install)" --max-cost 1</code></pre>
+    <p>The cap means a bad night costs at most a dollar. Read <code>UPDATES.md</code> with your coffee.</p>
+  </article>
+
+  <article class="recipe" data-tags="auto review">
+    <h3>13 · Enforce a rule with a hook</h3>
+    <p class="who"><b>WHEN</b> "Never edit generated files" keeps getting ignored.</p>
+<pre><code>{ "hooks": { "PreToolUse": [{ "matcher": "Edit|Write", "hooks": [{ "type": "command",
+  "command": "jq -r .tool_input.path | grep -q '^src/generated/' &amp;&amp; { echo 'generated: run pnpm codegen instead' &gt;&amp;2; exit 2; } || exit 0" }] }] } }</code></pre>
+    <p>Advice in AGENTS.md is usually followed. A hook is always followed.</p>
+  </article>
+
+  <article class="recipe" data-tags="learn">
+    <h3>14 · "What did we decide last week?"</h3>
+    <p class="who"><b>WHEN</b> You remember the conversation, not the conclusion.</p>
+<pre><code>uno
+› what did we decide about pagination in the API, and why?</code></pre>
+    <p>Uno uses <code>recall</code> to search past sessions in this project, reads around the hit, and answers with the date.</p>
+  </article>
+</section>
+
+<section class="page" data-page="practices">
+  <p class="crumb">GUIDES</p>
+  <h1>Best practices</h1>
+  <p class="lede">Habits that make Uno faster, cheaper and more right.</p>
+
+  <h2>Prompting</h2>
+  <ul>
+    <li><strong>Say what done looks like.</strong> "Fix it and run the tests" beats "fix it".</li>
+    <li><strong>Say what must not change.</strong> "Don't touch the public API." "Fix the code, not the test."</li>
+    <li><strong>Point at the place</strong> when you know it: "in src/api/orders.ts".</li>
+    <li><strong>Plan big things first.</strong> <code>--mode plan</code>, agree, then switch to accept-edits.</li>
+    <li><strong>Steer, don't restart.</strong> Type while it works; your words arrive at the next tool result.</li>
+  </ul>
+
+  <h2>Cost</h2>
+  <ul>
+    <li>Use a small model for chores, a big one for design and debugging.</li>
+    <li>Stay in one session for related tasks: the cache does the rest.</li>
+    <li>Use helpers for big reads; only the report enters your conversation.</li>
+    <li><code>/compact</code> between unrelated parts of a long session.</li>
+    <li><code>--no-search</code> when the web is not needed.</li>
+  </ul>
+
+  <h2>Safety</h2>
+  <ul>
+    <li>Keep the sandbox on; most commands never need to leave it.</li>
+    <li>Prefer narrow rules (<code>bash(npm run lint)</code>) over wide ones (<code>bash</code>).</li>
+    <li>Add <code>deny</code> rules for the things that would really hurt: <code>git push</code>, deploy scripts.</li>
+    <li>Don't trust a repo you have not read.</li>
+    <li>Commit before a big task, so <code>git</code> is your second undo.</li>
+  </ul>
+
+  <h2>Project setup</h2>
+  <ul>
+    <li>A short <code>AGENTS.md</code> with the build, test and lint commands.</li>
+    <li>Skills for procedures you repeat; hooks for things that must always happen.</li>
+    <li>Committed <code>.uno/settings.json</code> so the team shares one setup.</li>
+  </ul>
+</section>
+
+<section class="page" data-page="trouble">
+  <p class="crumb">GUIDES</p>
+  <h1>Troubleshooting</h1>
+  <p class="lede">The problems people hit most, and the fix for each.</p>
+
+  <table>
+    <thead><tr><th>You see</th><th>Why</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td><code>uno: command not found</code></td><td><code>~/.local/bin</code> is not on your <code>PATH</code></td><td>Add the line the installer printed to your shell profile</td></tr>
+      <tr><td>no API key</td><td>Uno looks in the environment, then <code>./.env</code>, then <code>~/.config/uno/.env</code></td><td>Put the key in <code>~/.config/uno/.env</code>; check the variable name</td></tr>
+      <tr><td><code>[N tool call(s) were refused…]</code> and exit 2</td><td>A <code>-p</code> run needed a say-so</td><td><code>--allow "&lt;rule&gt;"</code> or a rule in settings</td></tr>
+      <tr><td>A command fails with "operation not permitted" or no network</td><td>The sandbox did its job</td><td>Let the model ask to run it outside, or allow that one command</td></tr>
+      <tr><td>Every shell command asks, on Linux</td><td><code>bubblewrap</code> is missing, so there is no sandbox</td><td><code>sudo apt install bubblewrap</code></td></tr>
+      <tr><td>My project's hooks or MCP servers do nothing</td><td>The folder is not trusted, or its config changed</td><td><code>uno trust --status</code>, then <code>uno trust</code></td></tr>
+      <tr><td><code>needs sign-in: run uno mcp login &lt;name&gt;</code></td><td>The server signs in through the browser</td><td>Run it once; <code>--no-browser</code> over SSH</td></tr>
+      <tr><td><code>/undo</code> refuses</td><td>The file changed since: by you, or by a shell command</td><td>Check the file, then <code>/undo --force</code> if you are sure</td></tr>
+      <tr><td>"spending cap reached"</td><td>The total hit <code>UNO_SPEND_CAP_USD</code> ($5 by default)</td><td><code>uno spend</code>, then raise the cap</td></tr>
+      <tr><td>"grown too long" and exit 3</td><td>Even a summary would not fit the window</td><td>Start a new run and say what is left; <code>--window</code> for unknown models</td></tr>
+      <tr><td>Skills from <code>~/.claude/skills</code> missing</td><td>Left out by default</td><td><code>"skills": {"claude_home": true}</code></td></tr>
+      <tr><td>The screen looks wrong</td><td>A small or unusual terminal</td><td><code>--screen chat</code>; windows under 80 × 14 get it anyway</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Still stuck</h2>
+  <p><code>uno settings</code> shows every setting in effect and which file it came from, which explains most surprises. Then <a href="https://github.com/motiontic/unocode-releases/issues">open an issue</a>, even for small things.</p>
+</section>
+
+<!-- ============================== REFERENCE ============================== -->
+
+<section class="page" data-page="cli">
+  <p class="crumb">REFERENCE</p>
+  <h1>CLI</h1>
+  <p class="lede">Every command and option. <code>uno --help</code> prints the same list.</p>
+  <h2>Commands</h2>
+  <table>
+    <thead><tr><th>Command</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td><code>uno</code></td><td>Open a chat</td></tr>
+      <tr><td><code>uno -p "&lt;prompt&gt;"</code></td><td>Run one task and print the answer. To feed it text such as a diff, put it in the prompt: <code>"…: $(git diff)"</code>. Piped input is read only without <code>-p</code>, as the whole prompt: <code>echo "…" | uno</code></td></tr>
+      <tr><td><code>uno --resume [id] -p "…"</code></td><td>Continue a session; the newest if no id</td></tr>
+      <tr><td><code>uno --fork &lt;id&gt; -p "…"</code></td><td>Copy a session and continue the copy</td></tr>
+      <tr><td><code>uno sessions</code></td><td>List this folder's sessions</td></tr>
+      <tr><td><code>uno undo [--all] [--force]</code></td><td>Put back files changed by the newest session</td></tr>
+      <tr><td><code>uno trust [--status|--remove]</code></td><td>Let this folder's own settings, hooks and MCP servers take effect</td></tr>
+      <tr><td><code>uno settings</code></td><td>Show the settings in effect and where each came from</td></tr>
+      <tr><td><code>uno mcp login &lt;name&gt; [--no-browser]</code></td><td>Sign in to an HTTP MCP server in the browser</td></tr>
+      <tr><td><code>uno mcp logout &lt;name&gt;</code></td><td>Forget a sign-in</td></tr>
+      <tr><td><code>uno mcp status</code></td><td>Each server and how it signs in, without connecting</td></tr>
+      <tr><td><code>uno spend</code></td><td>Spending against the cap</td></tr>
+      <tr><td><code>uno update</code></td><td>Install the newest release, if uno came from the installer</td></tr>
+      <tr><td><code>uno --version</code>, <code>--help</code></td><td>Version, or every option</td></tr>
+    </tbody>
+  </table>
+  <h2>Options</h2>
+  <table>
+    <thead><tr><th>Option</th><th>Effect</th><th>Default</th></tr></thead>
+    <tbody>
+      <tr><td><code>--model &lt;name&gt;</code></td><td>Model to use</td><td><code>claude-sonnet-5</code></td></tr>
+      <tr><td><code>--provider &lt;name&gt;</code></td><td><code>anthropic</code>, <code>openai</code>, <code>openai-compat</code>, <code>gemini</code></td><td>from the model name</td></tr>
+      <tr><td><code>--base-url &lt;url&gt;</code></td><td>Server address for <code>openai-compat</code></td><td></td></tr>
+      <tr><td><code>--max-turns &lt;n&gt;</code></td><td>Most model calls in one run</td><td>30</td></tr>
+      <tr><td><code>--max-tokens &lt;n&gt;</code></td><td>Most output tokens per call</td><td>16000</td></tr>
+      <tr><td><code>--max-cost &lt;usd&gt;</code></td><td>Stop before this run spends more</td><td></td></tr>
+      <tr><td><code>--window &lt;tokens&gt;</code></td><td>Context window, for unknown models or earlier shortening</td><td>from the model table</td></tr>
+      <tr><td><code>--mode &lt;name&gt;</code></td><td><code>default</code>, <code>accept-edits</code>, <code>plan</code>, <code>bypass</code></td><td>chat: default; <code>-p</code>: accept-edits</td></tr>
+      <tr><td><code>--dangerously-skip-permissions</code></td><td>Same as <code>--mode bypass</code></td><td></td></tr>
+      <tr><td><code>--allow &lt;rule&gt;</code></td><td>Allow a tool call; repeatable</td><td></td></tr>
+      <tr><td><code>--allow-shell</code></td><td>Short for <code>--allow bash</code></td><td></td></tr>
+      <tr><td><code>--no-sandbox</code></td><td>Commands run unconfined, and ask</td><td></td></tr>
+      <tr><td><code>--no-search</code></td><td>No provider web search (<code>web_fetch</code> stays)</td><td></td></tr>
+      <tr><td><code>--no-memory</code></td><td>Nothing loaded, nothing saved</td><td></td></tr>
+      <tr><td><code>--image &lt;path&gt;</code></td><td>Attach an image to a <code>-p</code> prompt; repeatable</td><td></td></tr>
+      <tr><td><code>--output text|json</code></td><td>How to print the result</td><td>text</td></tr>
+      <tr><td><code>--screen dot|chat</code></td><td>The chat's screen</td><td>dot</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="page" data-page="chatref">
+  <p class="crumb">REFERENCE</p>
+  <h1>Slash commands and keys</h1>
+  <p class="lede">Everything you can type in the chat. <code>/help</code> shows the same.</p>
+  <div class="two">
+  <table>
+    <thead><tr><th>Command</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td><code>/help</code></td><td>Commands and keys</td></tr>
+      <tr><td><code>/mode [name]</code></td><td>Show or set the mode</td></tr>
+      <tr><td><code>/model [name]</code></td><td>Show or set the model, from the next turn</td></tr>
+      <tr><td><code>/undo [all]</code></td><td>Put back the last change, or all</td></tr>
+      <tr><td><code>/sessions</code>, <code>/resume</code>, <code>/fork</code></td><td>Earlier conversations</td></tr>
+      <tr><td><code>/compact</code></td><td>Shorten now, keeping a summary</td></tr>
+      <tr><td><code>/cost</code></td><td>This chat's spend and the total</td></tr>
+      <tr><td><code>/status</code>, <code>/context</code>, <code>/budget</code></td><td>Print the cards</td></tr>
+      <tr><td><code>/trust</code> [<code>status</code>|<code>remove</code>]</td><td>Trust this folder, show its trust state, or stop trusting it</td></tr>
+      <tr><td><code>/mcp</code>, <code>/mcp login|logout</code></td><td>MCP servers and sign-in</td></tr>
+      <tr><td><code>/skills</code>, <code>/memory</code></td><td>Skills; long-term memory</td></tr>
+      <tr><td><code>/reload</code></td><td>Re-read settings, skills, servers, instructions</td></tr>
+      <tr><td><code>/quit</code></td><td>Leave</td></tr>
+    </tbody>
+  </table>
+  <table>
+    <thead><tr><th>Key</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>Enter</kbd></td><td>Send</td></tr>
+      <tr><td><kbd>\</kbd> <kbd>Enter</kbd></td><td>New line</td></tr>
+      <tr><td><kbd>Esc</kbd>, <kbd>Ctrl-C</kbd></td><td>Stop the turn</td></tr>
+      <tr><td><kbd>Ctrl-D</kbd></td><td>Leave</td></tr>
+      <tr><td><kbd>↑</kbd> <kbd>↓</kbd></td><td>Earlier prompts</td></tr>
+      <tr><td><kbd>PgUp</kbd> <kbd>PgDn</kbd></td><td>Scroll back</td></tr>
+      <tr><td><kbd>Ctrl-V</kbd></td><td>Paste a picture</td></tr>
+      <tr><td><kbd>y</kbd> <kbd>a</kbd> <kbd>n</kbd></td><td>Answer a permission question</td></tr>
+      <tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>Move between answers</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>To start a prompt with a slash, type two: <code>//etc/hosts is wrong</code>.</p>
+</section>
+
+<section class="page" data-page="settings">
+  <p class="crumb">REFERENCE</p>
+  <h1>Settings</h1>
+  <p class="lede">Settings are JSON. Yours apply everywhere; a trusted project's apply on top.</p>
+  <ul>
+    <li><code>~/.config/uno/settings.json</code>: yours, every project.</li>
+    <li><code>.uno/settings.json</code> in the project, and the <code>permissions</code> and <code>hooks</code> of <code>.claude/settings.json</code> (nothing else from it): only after <code>uno trust</code>.</li>
+    <li>Data (sessions, memory, the spend record) lives in <code>~/.local/share/uno</code>.</li>
+  </ul>
+<pre><code>{
+  "permissions": { "allow": [], "ask": [], "deny": [] },
+  "sandbox": { "enabled": true, "network": false },
+  "web": { "search": true },
+  "memory": { "enabled": true },
+  "skills": { "claude_home": false },
+  "ui": { "screen": "dot", "accent": "red" },
+  "hooks": {},
+  "mcpServers": {}
+}</code></pre>
+  <table>
+    <thead><tr><th>Key</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>mode</code></td><td>The starting mode, for the chat and for <code>-p</code> runs alike (it replaces <code>-p</code>'s accept-edits default). <code>--mode</code> wins over it. Choose the model with <code>--model</code>.</td></tr>
+      <tr><td><code>permissions</code></td><td>Rules: see <a href="#/permissions">Permissions</a></td></tr>
+      <tr><td><code>sandbox.enabled</code></td><td>Run shell commands in the OS sandbox</td></tr>
+      <tr><td><code>sandbox.network</code></td><td>Let sandboxed commands reach the network (off by default)</td></tr>
+      <tr><td><code>web.search</code></td><td>Offer the provider's web search</td></tr>
+      <tr><td><code>memory.enabled</code></td><td>Load and save long-term memory</td></tr>
+      <tr><td><code>skills.claude_home</code></td><td>Also load <code>~/.claude/skills</code></td></tr>
+      <tr><td><code>ui.screen</code>, <code>ui.accent</code></td><td><code>dot</code> or <code>chat</code>; <code>red</code> or <code>yellow</code></td></tr>
+      <tr><td><code>hooks</code></td><td>See <a href="#/hooks">Hooks</a></td></tr>
+      <tr><td><code>mcpServers</code></td><td>See <a href="#/mcp">MCP servers</a></td></tr>
+    </tbody>
+  </table>
+  <p><code>uno settings</code> prints what is in effect and which file each value came from.</p>
+  <div class="why"><b>DESIGN DECISION · D25</b><p>JSON rather than TOML: one parser reads Uno's files and Claude Code's, and no extra library goes into the binary.</p></div>
+</section>
+
+<section class="page" data-page="env">
+  <p class="crumb">REFERENCE</p>
+  <h1>Environment</h1>
+  <p class="lede">Variables Uno reads. Keys may also sit in <code>./.env</code> or <code>~/.config/uno/.env</code>.</p>
+  <table>
+    <thead><tr><th>Variable</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>ANTHROPIC_API_KEY</code></td><td>Anthropic key</td></tr>
+      <tr><td><code>OPENAI_API_KEY</code></td><td>OpenAI key</td></tr>
+      <tr><td><code>GOOGLE_API_KEY</code>, <code>GEMINI_API_KEY</code></td><td>Gemini key</td></tr>
+      <tr><td><code>OPENAI_COMPAT_API_KEY</code></td><td>Key for an OpenAI-compatible server</td></tr>
+      <tr><td><code>UNO_SPEND_CAP_USD</code></td><td>Total spending cap; default 5</td></tr>
+      <tr><td><code>UNO_SCREEN</code></td><td><code>dot</code> or <code>chat</code></td></tr>
+      <tr><td><code>UNO_CONFIG_DIR</code></td><td>Config folder; default <code>~/.config/uno</code></td></tr>
+      <tr><td><code>UNO_DATA_DIR</code></td><td>Data folder; default <code>~/.local/share/uno</code></td></tr>
+      <tr><td><code>NO_COLOR</code></td><td>No colour; the dots stay</td></tr>
+      <tr><td><code>UNO_VERSION</code>, <code>UNO_INSTALL_DIR</code></td><td>For the installer: which version, and where</td></tr>
+    </tbody>
+  </table>
+  <p>Inside commands Uno runs, <code>UNO_AGENT</code> is set, so scripts can tell they are being run by Uno. Hooks also get <code>CLAUDE_PROJECT_DIR</code>.</p>
+</section>
+
+<section class="page" data-page="toolref">
+  <p class="crumb">REFERENCE</p>
+  <h1>Tool reference</h1>
+  <p class="lede">The exact tools the model sees, their inputs and limits. Use these names in rules and hooks.</p>
+  <table>
+    <thead><tr><th>Tool</th><th>Runs</th><th>Inputs</th><th>Limits</th></tr></thead>
+    <tbody>
+      <tr><td><code>read</code></td><td>together</td><td><code>path</code>, <code>offset?</code>, <code>limit?</code></td><td>2,000 lines / 50 KB; images to 2,000 px</td></tr>
+      <tr><td><code>write</code></td><td>alone</td><td><code>path</code>, <code>content</code></td><td>snapshot first</td></tr>
+      <tr><td><code>edit</code></td><td>alone</td><td><code>path</code>, <code>edits[{old, new, replace_all?}]</code></td><td>all or nothing; each <code>old</code> must match once</td></tr>
+      <tr><td><code>apply_patch</code></td><td>alone</td><td><code>patch</code></td><td>OpenAI models only, instead of <code>edit</code></td></tr>
+      <tr><td><code>bash</code></td><td>alone</td><td><code>command</code>, <code>yield_ms?</code>, <code>session_id?</code>, <code>stdin?</code></td><td>2,000 lines / 50 KB of tail; rest to a file</td></tr>
+      <tr><td><code>grep</code></td><td>together</td><td><code>pattern</code>, <code>path?</code>, <code>glob?</code>, <code>mode?</code></td><td>respects ignore files</td></tr>
+      <tr><td><code>glob</code></td><td>together</td><td><code>pattern</code>, <code>path?</code></td><td>newest first</td></tr>
+      <tr><td><code>web_fetch</code></td><td>together</td><td><code>url</code></td><td>15,000 characters, head and tail</td></tr>
+      <tr><td><code>recall</code></td><td>together</td><td>words, project, dates</td><td>prompts, replies, tool calls only</td></tr>
+      <tr><td><code>task</code></td><td>together</td><td><code>prompt</code>, <code>agent?</code>, <code>model?</code></td><td>depth 1, four at once</td></tr>
+      <tr><td><code>mcp_search</code>, <code>mcp_call</code></td><td><code>mcp_search</code> together, <code>mcp_call</code> alone</td><td><code>query</code> / <code>server</code>, <code>tool</code>, <code>args</code></td><td><code>mcp_search</code> never asks; <code>mcp_call</code> asks unless a rule allows it</td></tr>
+    </tbody>
+  </table>
+  <p>The tool list is fixed for the life of a session.</p>
+</section>
+
+<section class="page" data-page="output">
+  <p class="crumb">REFERENCE</p>
+  <h1>JSON output and exit codes</h1>
+  <p class="lede">What <code>uno -p --output json</code> prints, and what each exit code means.</p>
+<pre><code>{
+  "result": "Fixed parse_date and added a test. 14 tests pass.",
+  "exit": "done",
+  "turns": 6,
+  "usage": { "input_tokens": 3912, "output_tokens": 1104,
+             "cache_read_tokens": 41280, "cache_write_tokens": 2210 },
+  "cost_usd": "0.0187",
+  "model": "claude-sonnet-5",
+  "session_id": "a1f3…",
+  "refused": 0,
+  "sources": []
+}</code></pre>
+  <table>
+    <thead><tr><th>Exit code</th><th><code>exit</code></th><th>Means</th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td><code>done</code></td><td>Finished, nothing refused</td></tr>
+      <tr><td>2</td><td><code>done</code></td><td>Finished, but <code>refused</code> calls needed a say-so. Also: a UserPromptSubmit hook blocked the prompt, and then no JSON is printed</td></tr>
+      <tr><td>3</td><td><code>max_tokens</code>, <code>turn_limit</code>, <code>too_long</code></td><td>Stopped early: reply cut off, <code>--max-turns</code> reached, or the conversation outgrew the window</td></tr>
+      <tr><td>1</td><td><code>refusal</code>, or an error</td><td>The model declined, or something failed</td></tr>
+    </tbody>
+  </table>
+  <p><code>sources</code> lists the pages a web-search answer cited. Values are illustrative.</p>
+</section>
+
+<!-- ============================== DESIGN ============================== -->
+
+<section class="page" data-page="decisions">
+  <p class="crumb">DESIGN</p>
+  <h1>Design decisions</h1>
+  <p class="lede">Every big choice behind Uno, why it was made, and what it costs. The IDs match the project's decision log, so you can trace each one back.</p>
+  <div class="tldr"><b>THE THEME</b><span>Small core, honest limits, and never pay twice for the same tokens.</span></div>
+
+  <div class="dec"><span class="id">D1</span><div><h3>Rust, one static binary</h3><dl><dt>CHOICE</dt><dd>Write Uno in Rust and ship one file per machine.</dd><dt>WHY</dt><dd>No runtime to install, no garbage collector, direct access to the OS sandboxes. Starts in under 4 ms; about 3 MB on disk and in memory while idle.</dd><dt>COST</dt><dd>Slower to write than TypeScript, and fewer people can contribute.</dd></dl></div></div>
+
+  <div class="dec"><span class="id">D2</span><div><h3>No frameworks, no vendor SDKs</h3><dl><dt>CHOICE</dt><dd>Talk to each provider over plain HTTPS and server-sent events.</dd><dt>WHY</dt><dd>The core loop is under a thousand lines; frameworks add weight and decide things the model should decide.</dd><dt>COST</dt><dd>Each provider's new features must be added by hand.</dd></dl></div></div>
+
+  <div class="dec"><span class="id">D3</span><div><h3>One message format inside</h3><dl><dt>CHOICE</dt><dd>One internal format of content blocks; a thin adapter per provider.</dd><dt>WHY</dt><dd>The loop never sees provider JSON, so a fifth provider never touches it.</dd><dt>COST</dt><dd>Provider-only features need a place in the shared format first.</dd></dl></div></div>
+
+  <div class="dec"><span class="id">M7</span><div><h3>The prompt is append-only</h3><dl><dt>CHOICE</dt><dd>Never change the system prompt or tool list mid-session. Everything new arrives as a message at the end.</dd><dt>WHY</dt><dd>Any change at the start throws the provider's cache away, and cached tokens cost about a tenth.</dd><dt>COST</dt><dd>Some features take odd shapes: plan mode is a permission, MCP hides behind two tools, skills are file reads.</dd></dl></div></div>
+
+  <div class="dec"><span class="id">M15</span><div><h3>Instructions in the first user message</h3><dl><dt>CHOICE</dt><dd>Put AGENTS.md, memory and the skills list in the first user message, not the system prompt.</dd><dt>WHY</dt><dd>The system prompt is then identical in every project, so it caches everywhere.</dd><dt>COST</dt><dd>Some models weigh system-prompt text slightly more.</dd></dl></div></div>
+
+  <div class="dec"><span class="id">L3</span><div><h3>Two tools for all of MCP</h3><dl><dt>CHOICE</dt><dd><code>mcp_search</code> and <code>mcp_call</code> front every server.</dd><dt>WHY</dt><dd>About 250 tokens however many servers you add, and adding one never breaks the cache.</dd><dt>COST</dt><dd>One extra step the first time the model uses a tool.</dd></dl></div></div>
+
+  <div class="dec"><span class="id">R9</span><div><h3>Plan mode is a permission mode</h3><dl><dt>CHOICE</dt><dd>In plan mode, file changes (except the plan) and shell commands are refused at the moment of the call; the tools stay the same, and MCP calls and web fetches still ask as usual.</dd><dt>WHY</dt><dd>Switching modes keeps the cache. Studies found plan mode is more about safety and agreement than better results, so it stays minimal.</dd><dt>COST</dt><dd>The model may try a change and be told no, which costs a turn.</dd></dl></div></div>
+
+  <div class="dec"><span class="id">D14</span><div><h3>Sandbox network off by default</h3><dl><dt>CHOICE</dt><dd>Shell commands run with no network unless you allow one to leave the sandbox.</dd><dt>WHY</dt><dd>Exfiltration is the worst outcome of a tricked model, and most coding commands need no network.</dd><dt>COST</dt><dd>Installs ask, or need a rule.</dd></dl></div></div>
+
+  <div class="dec"><span class="id">D26</span><div><h3>Headless runs start in accept-edits</h3><dl><dt>CHOICE</dt><dd>With <code>-p</code>, project edits go ahead; anything else that would ask is refused, and the exit code says so.</dd><dt>WHY</dt><dd>Asking with nobody there makes <code>-p</code> useless; edits are inside the project and undoable.</dd><dt>COST</dt><dd>A careless prompt can still rewrite a lot of files. Commit first.</dd></dl></div></div>
+
+  <div class="dec"><span class="id">D31</span><div><h3>One "a" covers the group</h3><dl><dt>CHOICE</dt><dd><kbd>a</kbd> allows all edits, or one command prefix, for the session.</dd><dt>WHY</dt><dd>Asking per file trained people to press yes without reading.</dd><dt>COST</dt><dd>A broader yes than one file.</dd></dl></div></div>
+
+  <div class="dec"><span class="id">L12</span><div><h3>Flat helpers, depth one</h3><dl><dt>CHOICE</dt><dd>Helpers cannot start helpers; at most four at once; always a structured report.</dd><dt>WHY</dt><dd>What nearly every harness converged on: nested agents are hard to bound and debug.</dd><dt>COST</dt><dd>No deep trees of agents for very large jobs.</dd></dl></div></div>
+
+  <div class="dec"><span class="id">D33</span><div><h3>Memory is plain files</h3><dl><dt>CHOICE</dt><dd>A MEMORY.md index per project plus a global one, edited with the normal file tools.</dd><dt>WHY</dt><dd>You can read, fix, grep and version it. No database to corrupt.</dd><dt>COST</dt><dd>No fuzzy semantic search over memory; recall searches sessions by words instead.</dd></dl></div></div>
+
+  <div class="dec"><span class="id">D4</span><div><h3>Sessions as append-only JSONL</h3><dl><dt>CHOICE</dt><dd>One message per line, written as it happens.</dd><dt>WHY</dt><dd>Resume is reading, fork is copying, a crash loses at most one line.</dd><dt>COST</dt><dd>Listing many sessions means reading many files.</dd></dl></div></div>
+
+  <div class="dec"><span class="id">D23</span><div><h3>Plain threads, no async runtime</h3><dl><dt>CHOICE</dt><dd><code>ureq</code> and scoped threads rather than <code>tokio</code>.</dd><dt>WHY</dt><dd>An agent makes one request at a time; a runtime adds weight and start-up work. The whole engine was about 2 MB.</dd><dt>COST</dt><dd>Some libraries assume async and cannot be used.</dd></dl></div></div>
+
+  <div class="dec"><span class="id">D10</span><div><h3>Speak Claude Code's formats</h3><dl><dt>CHOICE</dt><dd>Read CLAUDE.md, <code>.claude/skills</code>, <code>.mcp.json</code> and Claude Code's hook contract, with AGENTS.md and <code>.agents/skills</code> as primary.</dd><dt>WHY</dt><dd>Your existing setup works on day one.</dd><dt>COST</dt><dd>Small differences must be documented, such as hook timeouts blocking.</dd></dl></div></div>
+
+  <div class="dec"><span class="id">D20</span><div><h3>A hard spending cap</h3><dl><dt>CHOICE</dt><dd>Check before every call, record after, fail closed.</dd><dt>WHY</dt><dd>Agents loop. A loop on a big model can spend real money in minutes.</dd><dt>COST</dt><dd>You must raise the cap on purpose when you need more.</dd></dl></div></div>
+
+  <div class="dec"><span class="id">D36</span><div><h3>Signed public releases</h3><dl><dt>CHOICE</dt><dd>Every file signed with minisign; the signature names the version and machine.</dd><dt>WHY</dt><dd>A self-updating program must prove each update is genuine.</dd><dt>COST</dt><dd>One more step in every release.</dd></dl></div></div>
+</section>
+
+<section class="page" data-page="notbuilt">
+  <p class="crumb">DESIGN</p>
+  <h1>What we didn't build</h1>
+  <p class="lede">Knowing what a tool leaves out tells you as much as knowing what it has. Some of these are coming; some are left out on purpose.</p>
+
+  <h2>Coming</h2>
+  <table>
+    <thead><tr><th>Feature</th><th>Plan</th><th>Until then</th></tr></thead>
+    <tbody>
+      <tr><td>Windows</td><td>PowerShell and Windows paths; no sandbox at first, so commands ask</td><td>WSL with the Linux build</td></tr>
+      <tr><td>A to-do list</td><td>Only for models that need it; frontier models plan fine on their own</td><td>Ask Uno to keep a TODO.md</td></tr>
+      <tr><td>Asking you questions mid-task</td><td>1 to 4 questions with options; never in headless runs or helpers</td><td>It stops and asks in its answer</td></tr>
+      <tr><td><code>uno schedule</code></td><td>Writes a cron, launchd or systemd entry; no background daemon</td><td>cron plus <code>uno -p</code></td></tr>
+      <tr><td><code>--output stream-json</code></td><td>Events as they happen, for other programs</td><td><code>--output json</code> at the end</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Later, maybe</h2>
+  <ul>
+    <li><strong>IDE plugins, cloud runs, parallel sessions in worktrees, language servers.</strong> Out of scope for version 1. The tool layer is built so remote execution can be added without a rewrite.</li>
+    <li><strong>Helpers you can talk to again.</strong> Today a helper reports and is done.</li>
+    <li><strong>A persistent code REPL.</strong> Useful for cheap experiments; if added, it will run your own interpreter through the guard.</li>
+  </ul>
+
+  <h2>Not on purpose</h2>
+  <ul>
+    <li><strong>An agent framework or workflow graph.</strong> The model plans; Uno gives it tools.</li>
+    <li><strong>An embedded JavaScript or Python runtime.</strong> Weight and attack surface for little gain.</li>
+    <li><strong>A vector database for memory.</strong> Plain files you can read beat embeddings you can't.</li>
+    <li><strong>Nested agents.</strong> Depth one is easier to bound and debug.</li>
+    <li><strong>Retrying after a tool call was shown.</strong> A retry could run a command twice.</li>
+    <li><strong>Trusting a hook's "allow".</strong> Hooks can only make things stricter.</li>
+  </ul>
+</section>
+
+<section class="page" data-page="glossary">
+  <p class="crumb">DESIGN</p>
+  <h1>Glossary</h1>
+  <p class="lede">Words these docs use, in one line each.</p>
+  <table>
+    <tbody>
+      <tr><td><strong>Agent loop</strong></td><td>Send the conversation, run the tools the model asks for, repeat until it answers.</td></tr>
+      <tr><td><strong>Cache / cached tokens</strong></td><td>The unchanged start of a request, which the provider charges about a tenth for.</td></tr>
+      <tr><td><strong>Compaction</strong></td><td>Shortening a long conversation: prune old tool output, then summarise.</td></tr>
+      <tr><td><strong>Context window</strong></td><td>How much text a model can read at once.</td></tr>
+      <tr><td><strong>Fork</strong></td><td>A copy of a session you continue separately.</td></tr>
+      <tr><td><strong>Guard</strong></td><td>Uno's checks on every tool call: trust, rules, mode, sandbox.</td></tr>
+      <tr><td><strong>Headless</strong></td><td>A run with nobody to ask: <code>uno -p</code>.</td></tr>
+      <tr><td><strong>Helper</strong></td><td>A fresh copy of Uno for a side job, which returns a report.</td></tr>
+      <tr><td><strong>Hook</strong></td><td>Your command, run at a fixed point in a turn.</td></tr>
+      <tr><td><strong>MCP</strong></td><td>Model Context Protocol: the standard for plugging tools into agents.</td></tr>
+      <tr><td><strong>Mode</strong></td><td>How much Uno does without asking: default, accept-edits, plan, bypass.</td></tr>
+      <tr><td><strong>Rule</strong></td><td>An allow, ask or deny entry for a tool call.</td></tr>
+      <tr><td><strong>Sandbox</strong></td><td>The OS fence around shell commands.</td></tr>
+      <tr><td><strong>Skill</strong></td><td>A folder of instructions, read only when a task needs it.</td></tr>
+      <tr><td><strong>Trust</strong></td><td>Your say-so for a project's own settings, hooks and servers.</td></tr>
+      <tr><td><strong>Turn</strong></td><td>One model call and the tools it asked for.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+</main>
+
+<aside class="otp" aria-label="On this page">
+  <p>ON THIS PAGE</p>
+  <div class="list"></div>
+  <div class="edit"><a href="https://github.com/motiontic/unocode-releases/issues">Something unclear? Open an issue</a></div>
+</aside>
+
+</div>
+
+<footer class="foot">
+  <span class="dots small">UNO</span>
+  <span>unocode docs · version 0.1.1</span>
+  <span style="margin-left: auto; display: flex; gap: 16px;"><a href="index.html">Home</a><a href="https://github.com/motiontic/unocode-releases/issues">Issues</a><a href="https://github.com/motiontic/unocode-releases/releases">Releases</a></span>
+</footer>
+
+<script src="docs.js"></script>
+</body>
+</html>
